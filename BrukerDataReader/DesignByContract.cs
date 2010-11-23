@@ -5,6 +5,10 @@ using System.Diagnostics;
 
 namespace BrukerDataReader
 {
+
+    public class CoverageExcludeAttribute : System.Attribute { }
+
+    [CoverageExcludeAttribute]
     public sealed class Check
     {
         #region Interface
@@ -241,6 +245,7 @@ namespace BrukerDataReader
     /// any DesignByContract exception and other runtime exceptions.
     ///  
     /// </summary>
+    [CoverageExcludeAttribute]
     [Serializable]
     public class DesignByContractException : ApplicationException
     {
@@ -252,6 +257,7 @@ namespace BrukerDataReader
     /// <summary>
     /// Exception raised when a precondition fails.
     /// </summary>
+    [CoverageExcludeAttribute]
     [Serializable]
     public class PreconditionException : DesignByContractException
     {
@@ -272,6 +278,7 @@ namespace BrukerDataReader
     /// <summary>
     /// Exception raised when a postcondition fails.
     /// </summary>
+    [CoverageExcludeAttribute]
     [Serializable]
     public class PostconditionException : DesignByContractException
     {
@@ -292,6 +299,7 @@ namespace BrukerDataReader
     /// <summary>
     /// Exception raised when an invariant fails.
     /// </summary>
+    [CoverageExcludeAttribute]
     [Serializable]
     public class InvariantException : DesignByContractException
     {
@@ -312,6 +320,7 @@ namespace BrukerDataReader
     /// <summary>
     /// Exception raised when an assertion fails.
     /// </summary>
+    [CoverageExcludeAttribute]
     [Serializable]
     public class AssertionException : DesignByContractException
     {

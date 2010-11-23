@@ -12,53 +12,35 @@ namespace BrukerDataReader.UnitTests
     public class DataReaderTests
     {
 
-        double m_sampleRate = 909090.90909090906;
-        double m_numPointsInScan = 524288;
-        double m_calA = 184345587.303392;
-        double m_calB = 5.78258691122419;
-
-
-
-        [Test]
-        public void openFileAndDisplaySomeContents()
-        {
-            DataReader reader = new DataReader(FileRefs.Bruker_12T_FID_File1);
-
-         
-
-        }
-
-
         [Test]
         public void GetNumMSScans_Test1()
         {
             DataReader reader = new DataReader(FileRefs.Bruker_12T_ser_File1);
             reader.Parameters = new GlobalParameters();
-            reader.Parameters.NumPointsInScan = 524288;
+            reader.Parameters.NumValuesInScan = 524288;
             Assert.AreEqual(8, reader.GetNumMSScans());
         }
-
 
         [Test]
         public void GetNumMSScans_Test2()
         {
             DataReader reader = new DataReader(FileRefs.Bruker_12T_FID_File1);
             reader.Parameters = new GlobalParameters();
-            reader.Parameters.NumPointsInScan = 524288;
+            reader.Parameters.NumValuesInScan = 524288;
             Assert.AreEqual(1, reader.GetNumMSScans());
         }
 
         [Test]
-        public void GetMassSpectrumTest1()
+        public void GetMassSpectrum_Bruker12T_FID_Test1()
         {
             DataReader reader = new DataReader(FileRefs.Bruker_12T_FID_File1);
             reader.Parameters.SampleRate = 909090.90909090906;
-            reader.Parameters.NumPointsInScan = 524288;
+            reader.Parameters.NumValuesInScan = 524288;
             reader.Parameters.CalA = 184345587.303392;
-            reader.Parameters.CalB= 5.78258691122419;
+            reader.Parameters.CalB = 5.78258691122419;
 
-            float[]mzvals = null;
-            float[]intensities=null;
+            float[] mzvals = null;
+            float[] intensities = null;
 
             reader.GetMassSpectrum(0, ref mzvals, ref intensities);
 
@@ -66,157 +48,232 @@ namespace BrukerDataReader.UnitTests
             Assert.AreNotEqual(0, mzvals.Length);
 
             TestUtilities.DisplayXYValues(mzvals, intensities);
+        }
+
+        [Test]
+        public void GetMassSpectrum_Bruker9T_Test1()
+        {
+            DataReader reader = new DataReader(FileRefs.Bruker_9T_ser_File1);
+            
+            reader.Parameters.CalA = 144378935.472081;
+            reader.Parameters.CalB = 20.3413771463121;
+            reader.Parameters.SampleRate = 740740.74074074;
+            reader.Parameters.NumValuesInScan = 524288;
+
+            Assert.AreEqual(4275, reader.GetNumMSScans());
+            Assert.AreEqual(FileRefs.Bruker_9T_ser_File1, reader.FileName);
+
+            float[] mzvals = null;
+            float[] intensities = null;
+
+            int testScan = 1000;
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            reader.GetMassSpectrum(testScan, ref mzvals, ref intensities);
+            sw.Stop();
+            TestUtilities.DisplayXYValues(mzvals, intensities);
+            Console.WriteLine();
+            Console.WriteLine("Time= " + sw.ElapsedMilliseconds);
+
+            reader.GetMassSpectrum(testScan, ref mzvals, ref intensities);
+
 
         }
 
+        [Test]
+        public void GetMassSpectrum_Bruker15T_Test1()
+        {
+            DataReader reader = new DataReader(FileRefs.Bruker15TFile1);
+            reader.Parameters.CalA = 230337466.449292;
+            reader.Parameters.CalB = 7.00924491472374;
+            reader.Parameters.SampleRate = 1153846.15384615;
+            reader.Parameters.NumValuesInScan = 524288;
+
+            Assert.AreEqual(18, reader.GetNumMSScans());
 
 
+            float[] mzvals = null;
+            float[] intensities = null;
+            int testScan = 4;
+            reader.GetMassSpectrum(testScan, ref mzvals, ref intensities);
+            Assert.AreEqual(789.9679m, (decimal)mzvals[129658]);
 
-      
+            //            TestUtilities.DisplayXYValues(mzvals, intensities);
+
+
+        }
+
 
 
 
 
         [Test]
-        public void openAndReadBinaryTest1()
+        public void GetMassSpectrum_smallMZRange_Test1()
         {
-            BinaryReader reader = new BinaryReader(File.Open(FileRefs.Bruker_12T_FID_File1, FileMode.Open));
+            DataReader reader = new DataReader(FileRefs.Bruker_9T_ser_File1);
+            reader.Parameters.CalA = 144378935.472081;
+            reader.Parameters.CalB = 20.3413771463121;
+            reader.Parameters.SampleRate = 740740.74074074;
+            reader.Parameters.NumValuesInScan = 524288;
 
-            StringBuilder sb = new StringBuilder();
 
-            long length = reader.BaseStream.Length;
+            float[] mzvals = null;
+            float[] intensities = null;
 
-            Console.WriteLine("Length is " + length);
+            int testScan = 1000;
 
-            Console.WriteLine("number of 8 byte chunks = " + (double)length / 8d);
+            float minMZ = 695.5f;
+            float maxMz = 696.9f;
 
-            int counter = 0;
-            while (true)
-            {
-                counter++;
-                if (counter > 1000) break;
-                int testVal = reader.ReadInt32();
-                //long testVal = reader.ReadInt64();
-                sb.Append(testVal);
-                sb.Append(Environment.NewLine);
-
-            }
-
-            Console.WriteLine(sb.ToString());
-
-            reader.Close();
+            reader.GetMassSpectrum(testScan, minMZ, maxMz, ref mzvals, ref intensities);
         }
 
 
         [Test]
-        public void openReadAndWriteOutToTextFileTest1()
+        public void GetMassSpectrum_extremeMZRange_test1()
         {
-            BinaryReader reader = new BinaryReader(File.Open(FileRefs.Bruker_12T_FID_File1, FileMode.Open));
-            long length = reader.BaseStream.Length;
+            DataReader reader = new DataReader(FileRefs.Bruker_9T_ser_File1);
+            reader.Parameters.CalA = 144378935.472081;
+            reader.Parameters.CalB = 20.3413771463121;
+            reader.Parameters.SampleRate = 740740.74074074;
+            reader.Parameters.NumValuesInScan = 524288;
 
-            long numberOfPointsToRead = length / sizeof(Int32);
 
-            int counter = 0;
+            float[] mzvals = null;
+            float[] intensities = null;
 
-            Console.WriteLine("Length is " + length);
-            Console.WriteLine("number of 4 byte chunks = " + (double)length / 4d);
-            using (StreamWriter sw = new StreamWriter(FileRefs.Bruker_12T_FID_File1 + ".txt"))
-            {
-                Stopwatch stopwatch = new Stopwatch();
-                stopwatch.Start();
-                while (counter < numberOfPointsToRead)
-                {
-                    counter++;
-                    Int32 value = reader.ReadInt32();
-                    sw.WriteLine(value);
-                }
-                stopwatch.Stop();
-                Console.WriteLine("time= " + stopwatch.ElapsedMilliseconds);
-            }
+            int testScan = 1000;
 
-            reader.Close();
+            float minMZ = 1f;
+            float maxMz = 1e7f;
+
+            reader.GetMassSpectrum(testScan, minMZ, maxMz, ref mzvals, ref intensities);
+            int arrayLength = mzvals.Length;
+
+            reader.GetMassSpectrum(testScan, ref mzvals, ref intensities);
+            Assert.AreEqual(mzvals.Length, arrayLength);
         }
 
         [Test]
-        public void openReadandTryFFT_Test1()
+        public void SetParametersTest1()
         {
-            BinaryReader reader = new BinaryReader(File.Open(FileRefs.Bruker_12T_FID_File1, FileMode.Open));
-            long length = reader.BaseStream.Length;
+            DataReader reader = new DataReader(FileRefs.Bruker_9T_ser_File1);
 
-            long numberOfPointsToRead = length / sizeof(Int32);
+            GlobalParameters gp = new GlobalParameters();
+            gp.CalA = 144378935.472081;
+            gp.CalB = 20.3413771463121;
+            gp.SampleRate = 740740.74074074;
+            gp.NumValuesInScan = 524288;
 
-            int counter = 0;
+            reader.SetParameters(gp);
 
-            Console.WriteLine("Length is " + length);
-            Console.WriteLine("number of 4 byte chunks = " + (double)length / 4d);
+            Assert.AreEqual(144378935.472081, reader.Parameters.CalA);
+            Assert.AreEqual(20.3413771463121, reader.Parameters.CalB);
+        }
 
-            List<long> data = new List<long>();
+        [Test]
+        public void SetParameters_alternateConstructorTest1()
+        {
+            DataReader reader = new DataReader(FileRefs.Bruker_9T_ser_File1);
+            reader.SetParameters(144378935.472081, 20.3413771463121, 740740.74074074, 524288);
+            Assert.AreEqual(144378935.472081, reader.Parameters.CalA);
+            Assert.AreEqual(20.3413771463121, reader.Parameters.CalB);
+        }
 
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-
-            float[] vals = new float[numberOfPointsToRead];
-
-            for (int i = 0; i < numberOfPointsToRead; i++)
-            {
-                vals[i] = reader.ReadInt32();
-            }
-
-            int lengthOfMZAndIntensityArray = (int)numberOfPointsToRead / 2;
-
-            double[] mzVals = new double[lengthOfMZAndIntensityArray];
-            double[] intensities = new double[lengthOfMZAndIntensityArray];
-
-            DeconEngine.Utils.FourierTransform(ref vals);
-
-            for (int i = 0; i < lengthOfMZAndIntensityArray; i++)
-            {
-                double mz = getMZ(i);
-                double intensity = Math.Sqrt(vals[2 * i + 1] * vals[2 * i + 1] + vals[2 * i] * vals[2 * i]);
-
-                int indexForReverseInsertion = (lengthOfMZAndIntensityArray - i - 1);
-                mzVals[indexForReverseInsertion] = mz;
-                intensities[indexForReverseInsertion] = i;
-            }
+        [Test]
+        public void ExceptionTest_inputScanNumTooHigh_Test1()
+        {
+            DataReader reader = new DataReader(FileRefs.Bruker_9T_ser_File1);
+            reader.Parameters.CalA = 144378935.472081;
+            reader.Parameters.CalB = 20.3413771463121;
+            reader.Parameters.SampleRate = 740740.74074074;
+            reader.Parameters.NumValuesInScan = 524288;
 
 
-            stopwatch.Stop();
+            float[] mzvals = null;
+            float[] intensities = null;
 
-            using (StreamWriter sw = new StreamWriter(FileRefs.Bruker_12T_FID_File1 + "_ScanData.txt"))
-            {
+            int testScan = 5000;
 
-                for (int i = 0; i < mzVals.Length; i++)
-                {
-                    sw.Write(mzVals[i]);
-                    sw.Write('\t');
-                    sw.Write(intensities[i]);
-                    sw.WriteLine();
+            float minMZ = 695.5f;
+            float maxMz = 696.9f;
 
-                }
-
-            }
-
-            Console.WriteLine("time = " + stopwatch.ElapsedMilliseconds);
-
+            var ex = Assert.Throws<BrukerDataReader.PreconditionException>(() => reader.GetMassSpectrum(testScan, minMZ, maxMz, ref mzvals, ref intensities));
+            Assert.That(ex.Message, Is.EqualTo("Cannot get mass spectrum. Requested scan num is greater than number of scans in dataset."));
 
         }
 
-        private double getMZ(int i)
+        [Test]
+        public void ExceptionTest_inputScanNumTooHigh_Test2()
         {
-            double freq = i * m_sampleRate / m_numPointsInScan;
+            DataReader reader = new DataReader(FileRefs.Bruker_9T_ser_File1);
+            reader.Parameters.CalA = 144378935.472081;
+            reader.Parameters.CalB = 20.3413771463121;
+            reader.Parameters.SampleRate = 740740.74074074;
+            reader.Parameters.NumValuesInScan = 524288;
 
-            double mass = 0;
-            if (freq + m_calB != 0)
-                mass = m_calA / (freq + m_calB);
-            else if (freq - m_calB <= 0)
-                mass = m_calA;
-            else
-                mass = 0;
-            return mass;
+
+            float[] mzvals = null;
+            float[] intensities = null;
+
+            int testScan = 5000;
+
+            var ex = Assert.Throws<BrukerDataReader.PreconditionException>(() => reader.GetMassSpectrum(testScan, ref mzvals, ref intensities));
+            Assert.That(ex.Message, Is.EqualTo("Cannot get mass spectrum. Requested scan num is greater than number of scans in dataset."));
+
+        }
+        [Test]
+        public void ExceptionTest_parametersNotSet_Test1()
+        {
+            DataReader reader = new DataReader(FileRefs.Bruker_9T_ser_File1);
+
+            float[] mzvals = null;
+            float[] intensities = null;
+
+            int testScan = 1000;
+
+            var ex = Assert.Throws<BrukerDataReader.PreconditionException>(() => reader.GetMassSpectrum(testScan, ref mzvals, ref intensities));
+            Assert.That(ex.Message, Is.EqualTo("Cannot get mass spectrum. Need to first set Parameters."));
 
         }
 
+        [Test]
+        public void ExceptionTest_parametersNotSet_Test2()
+        {
+            DataReader reader = new DataReader(FileRefs.Bruker_9T_ser_File1);
 
+            float[] mzvals = null;
+            float[] intensities = null;
+
+            int testScan = 1000;
+            float minMZ = 695.5f;
+            float maxMz = 696.9f;
+
+            var ex = Assert.Throws<BrukerDataReader.PreconditionException>(() => reader.GetMassSpectrum(testScan, minMZ, maxMz, ref mzvals, ref intensities));
+            Assert.That(ex.Message, Is.EqualTo("Cannot get mass spectrum. Need to first set Parameters."));
+
+        }
+
+        [Test]
+        public void ExceptionTest_maxMZ_smallerThanMinMZ_Test1()
+        {
+            DataReader reader = new DataReader(FileRefs.Bruker_9T_ser_File1);
+            reader.Parameters.CalA = 144378935.472081;
+            reader.Parameters.CalB = 20.3413771463121;
+            reader.Parameters.SampleRate = 740740.74074074;
+            reader.Parameters.NumValuesInScan = 524288;
+
+            float[] mzvals = null;
+            float[] intensities = null;
+
+            int testScan = 1000;
+            float minMZ = 700f;
+            float maxMz = 600f;
+
+            var ex = Assert.Throws<BrukerDataReader.PreconditionException>(() => reader.GetMassSpectrum(testScan, minMZ, maxMz, ref mzvals, ref intensities));
+            Assert.That(ex.Message, Is.EqualTo("Cannot get mass spectrum. MinMZ is greater than MaxMZ - that's impossible."));
+
+        }
 
 
 
