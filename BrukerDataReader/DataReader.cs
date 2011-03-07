@@ -181,42 +181,149 @@ namespace BrukerDataReader
         /// <param name="intensities">intensity values are returned here</param>
         public void GetMassSpectrum(int scanNum, ref float[] mzValues, ref float[] intensities)
         {
-            Check.Require(Parameters != null && Parameters.CalA != -1, "Cannot get mass spectrum. Need to first set Parameters.");
-            Check.Require(scanNum < GetNumMSScans(), "Cannot get mass spectrum. Requested scan num is greater than number of scans in dataset.");
+            int[] scanNums = new int[] { scanNum };
 
-            float[] vals = new float[Parameters.NumValuesInScan];
+            GetMassSpectrum(scanNums, ref mzValues, ref intensities);
+
+            //Delete this after confirming correctness
+            //Check.Require(Parameters != null && Parameters.CalA != -1, "Cannot get mass spectrum. Need to first set Parameters.");
+ 
+            //float[] vals = new float[Parameters.NumValuesInScan];
+
+            //using (BinaryReader reader = new BinaryReader(File.Open(m_fileName, FileMode.Open)))
+            //{
+            //    long bytePosition = (long)scanNum * (long)Parameters.NumValuesInScan * (long)sizeof(Int32);
+
+            //    reader.BaseStream.Seek(bytePosition, SeekOrigin.Begin);
+            //    for (int i = 0; i < Parameters.NumValuesInScan; i++)
+            //    {
+            //        vals[i] = reader.ReadInt32();
+            //    }
+
+            //    reader.Close();
+            //}
+
+            //int lengthOfMZAndIntensityArray = Parameters.NumValuesInScan / 2;
+            //float[] mzValuesFullRange = new float[lengthOfMZAndIntensityArray];
+            //float[] intensitiesFullRange = new float[lengthOfMZAndIntensityArray];
+
+            //DeconEngine.Utils.FourierTransform(ref vals);
+
+            //for (int i = 0; i < lengthOfMZAndIntensityArray; i++)
+            //{
+            //    float mz = (float)getMZ(i);
+            //    float intensity = (float)(Math.Sqrt(vals[2 * i + 1] * vals[2 * i + 1] + vals[2 * i] * vals[2 * i]));
+
+            //    int indexForReverseInsertion = (lengthOfMZAndIntensityArray - i - 1);
+            //    mzValuesFullRange[indexForReverseInsertion] = mz;
+            //    intensitiesFullRange[indexForReverseInsertion] = intensity;
+            //}
+
+            ////trim off m/z values according to parameters
+            //int indexOfLowMZ = getIndexForMZ(Parameters.MinMZ, lengthOfMZAndIntensityArray);
+            //int indexOfHighMZ = getIndexForMZ(Parameters.MaxMZ, lengthOfMZAndIntensityArray);
+
+
+
+            //mzValues = new float[indexOfHighMZ - indexOfLowMZ];
+            //intensities = new float[indexOfHighMZ - indexOfLowMZ];
+
+            //for (int i = indexOfLowMZ; i < indexOfHighMZ; i++)
+            //{
+            //    mzValues[i - indexOfLowMZ] = mzValuesFullRange[i];
+            //    intensities[i - indexOfLowMZ] = intensitiesFullRange[i];
+            //}
+
+
+        }
+
+
+        public void GetMassSpectrum(int scanNum, float minMZ, float maxMZ, ref float[] mzValues, ref float[] intensities)
+        {
+            Check.Require(Parameters != null && Parameters.CalA != -1, "Cannot get mass spectrum. Need to first set Parameters.");
+            Check.Require(maxMZ >= minMZ, "Cannot get mass spectrum. MinMZ is greater than MaxMZ - that's impossible.");
+
+
+            Parameters.MinMZ = minMZ;
+            Parameters.MaxMZ = maxMZ;
+
+            GetMassSpectrum(scanNum, ref mzValues, ref intensities);
+        }
+
+
+        /// <summary>
+        /// Gets the summed mass spectrum.
+        /// </summary>
+        /// <param name="scanNumsToBeSummed"></param>
+        /// <param name="minMZ"></param>
+        /// <param name="maxMZ"></param>
+        /// <param name="mzValues"></param>
+        /// <param name="intensities"></param>
+        public void GetMassSpectrum(int[] scanNumsToBeSummed, ref float[] mzValues, ref float[] intensities)
+        {
+            Check.Require(Parameters != null && Parameters.CalA != -1, "Cannot get mass spectrum. Need to first set Parameters.");
+
+            validateScanNums(scanNumsToBeSummed);
+            //Check.Require(scanNum < GetNumMSScans(), "Cannot get mass spectrum. Requested scan num is greater than number of scans in dataset.");
+
+      
+            List<float[]> scanDataList = new List<float[]>();
 
             using (BinaryReader reader = new BinaryReader(File.Open(m_fileName, FileMode.Open)))
             {
-                long bytePosition = (long)scanNum * (long)Parameters.NumValuesInScan * (long)sizeof(Int32);
 
-                reader.BaseStream.Seek(bytePosition, SeekOrigin.Begin);
-                for (int i = 0; i < Parameters.NumValuesInScan; i++)
+                foreach (var scanNum in scanNumsToBeSummed)
                 {
-                    vals[i] = reader.ReadInt32();
+                    float[] vals = new float[Parameters.NumValuesInScan];
+
+                    long bytePosition = (long)scanNum * (long)Parameters.NumValuesInScan * (long)sizeof(Int32);
+
+                    reader.BaseStream.Seek(bytePosition, SeekOrigin.Begin);
+                    for (int i = 0; i < Parameters.NumValuesInScan; i++)
+                    {
+                        vals[i] = reader.ReadInt32();
+                    }
+
+                    scanDataList.Add(vals);
+
                 }
+
+                reader.Close();
+
             }
+
 
             int lengthOfMZAndIntensityArray = Parameters.NumValuesInScan / 2;
             float[] mzValuesFullRange = new float[lengthOfMZAndIntensityArray];
             float[] intensitiesFullRange = new float[lengthOfMZAndIntensityArray];
 
-            DeconEngine.Utils.FourierTransform(ref vals);
 
-            for (int i = 0; i < lengthOfMZAndIntensityArray; i++)
+            for (int i = 0; i < scanDataList.Count; i++)
             {
-                float mz = (float)getMZ(i);
-                float intensity = (float)(Math.Sqrt(vals[2 * i + 1] * vals[2 * i + 1] + vals[2 * i] * vals[2 * i]));
+                float[] vals = scanDataList[i];
+                DeconEngine.Utils.FourierTransform(ref vals);
 
-                int indexForReverseInsertion = (lengthOfMZAndIntensityArray - i - 1);
-                mzValuesFullRange[indexForReverseInsertion] = mz;
-                intensitiesFullRange[indexForReverseInsertion] = intensity;
+                for (int j = 0; j < lengthOfMZAndIntensityArray; j++)
+                {
+
+                    int indexForReverseInsertion = (lengthOfMZAndIntensityArray - j - 1);
+
+                    bool firstTimeThrough = (i == 0);
+                    if (firstTimeThrough)
+                    {
+                        float mz = (float)getMZ(j);
+                        mzValuesFullRange[indexForReverseInsertion] = mz;
+                    }
+
+                    float intensity = (float)(Math.Sqrt(vals[2 * j + 1] * vals[2 * j + 1] + vals[2 * j] * vals[2 * j]));
+                    intensitiesFullRange[indexForReverseInsertion] += intensity;    //sum the intensities
+                }
+
             }
 
             //trim off m/z values according to parameters
             int indexOfLowMZ = getIndexForMZ(Parameters.MinMZ, lengthOfMZAndIntensityArray);
             int indexOfHighMZ = getIndexForMZ(Parameters.MaxMZ, lengthOfMZAndIntensityArray);
-
 
 
             mzValues = new float[indexOfHighMZ - indexOfLowMZ];
@@ -229,21 +336,35 @@ namespace BrukerDataReader
             }
 
 
+
+
         }
 
 
-        public void GetMassSpectrum(int scanNum, float minMZ, float maxMZ, ref float[] mzValues, ref float[] intensities)
+        public void GetMassSpectrum(int[] scansNumsToBeSummed, float minMZ, float maxMZ, ref float[] mzValues, ref float[] intensities)
         {
-            Check.Require(Parameters != null && Parameters.CalA != -1, "Cannot get mass spectrum. Need to first set Parameters.");
-            Check.Require(scanNum < GetNumMSScans(), "Cannot get mass spectrum. Requested scan num is greater than number of scans in dataset.");
             Check.Require(maxMZ >= minMZ, "Cannot get mass spectrum. MinMZ is greater than MaxMZ - that's impossible.");
 
 
             Parameters.MinMZ = minMZ;
             Parameters.MaxMZ = maxMZ;
 
-            GetMassSpectrum(scanNum, ref mzValues, ref intensities);
+            GetMassSpectrum(scansNumsToBeSummed, ref mzValues, ref intensities);
+
         }
+
+
+
+
+        private void validateScanNums(int[] scanNumsToBeSummed)
+        {
+            foreach (var scanNum in scanNumsToBeSummed)
+            {
+                Check.Require(scanNum < GetNumMSScans(),"Cannot get mass spectrum. Requested scan num (" + scanNum+ ") is greater than number of scans in dataset.");
+                
+            }
+        }
+
 
 
 

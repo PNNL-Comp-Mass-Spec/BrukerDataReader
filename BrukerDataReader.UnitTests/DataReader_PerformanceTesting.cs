@@ -64,6 +64,7 @@ namespace BrukerDataReader.UnitTests
 
         }
 
+        [Test]
         public void consecutiveScans_Test1()
         {
             DataReader reader = new DataReader(FileRefs.Bruker_9T_ser_File1);
@@ -110,7 +111,8 @@ namespace BrukerDataReader.UnitTests
 
 
         }
-
+     
+        [Test]
         public void consecutiveScans_SlowButSureTest1() // I find this to be about 3 to 10% slower than using a relative byte pointer
         {
             DataReader reader = new DataReader(FileRefs.Bruker_9T_ser_File1);
@@ -158,6 +160,59 @@ namespace BrukerDataReader.UnitTests
 
         }
 
+        [Test]
+        public void sumAcrossThreeScansTest1()
+        {
+            DataReader reader = new DataReader(FileRefs.Bruker_9T_ser_File1);
+            reader.Parameters.CalA = 144378935.472081;
+            reader.Parameters.CalB = 20.3413771463121;
+            reader.Parameters.SampleRate = 740740.74074074;
+            reader.Parameters.NumValuesInScan = 524288;
+
+            Assert.AreEqual(4275, reader.GetNumMSScans());
+
+            float[] mzvals = null;
+            float[] intensities = null;
+
+            List<long> timeList = new List<long>();
+
+            int scanNum = 1000;
+            reader.GetMassSpectrum(scanNum, ref mzvals, ref intensities);
+
+            int testIndex = 100000;
+
+            float testXVal = mzvals[testIndex];
+            float testYVal = intensities[testIndex];
+
+
+            Stopwatch sw = new Stopwatch();
+            for (int i = 0; i < 100; i++)
+            {
+                sw.Start();
+
+                int currentScan = scanNum + i;
+
+                int[] scansToBeSummed = { currentScan - 1, currentScan, currentScan + 1 };
+
+                Console.Write("scan= " + currentScan);
+                reader.GetMassSpectrum(scansToBeSummed, ref mzvals, ref intensities);
+                sw.Stop();
+                Console.WriteLine("; time= " + sw.ElapsedMilliseconds);
+                timeList.Add(sw.ElapsedMilliseconds);
+                sw.Reset();
+
+
+
+            }
+
+            Console.WriteLine("Average time = " + timeList.Average());
+
+        }
+
+
+
+
+        [Test]
         public void consecutiveScans_smallMZRangeTest1()     // result:  smaller m/z range doesn't make it quicker.
         {
             DataReader reader = new DataReader(FileRefs.Bruker_9T_ser_File1);
