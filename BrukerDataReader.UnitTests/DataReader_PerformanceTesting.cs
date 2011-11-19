@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
-using System.Diagnostics;
 
 namespace BrukerDataReader.UnitTests
 {
