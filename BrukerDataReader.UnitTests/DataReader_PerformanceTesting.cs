@@ -7,6 +7,7 @@ using NUnit.Framework;
 namespace BrukerDataReader.UnitTests
 {
     [TestFixture]
+    [Category("LongRunning")]
     public class DataReader_PerformanceTesting
     {
         /// <summary>
