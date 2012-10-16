@@ -35,10 +35,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DeconEngineV2, Version=1.0.3924.26313, Culture=neutral">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\DeconTools\Library\DeconEngineV2.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -55,6 +51,7 @@
   <ItemGroup>
     <Compile Include="DataReader.cs" />
     <Compile Include="DesignByContract.cs" />
+    <Compile Include="FourierTransform.cs" />
     <Compile Include="GlobalParameters.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

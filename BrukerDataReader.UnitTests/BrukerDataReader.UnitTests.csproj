@@ -35,10 +35,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DeconEngineV2, Version=1.0.3924.26313, Culture=neutral">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\DeconTools\Library\DeconEngineV2.dll</HintPath>
-    </Reference>
     <Reference Include="MathNet.Iridium, Version=2008.8.16.470, Culture=neutral, PublicKeyToken=c061a3ec32cc0c6f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Library\MathNet.Iridium.dll</HintPath>

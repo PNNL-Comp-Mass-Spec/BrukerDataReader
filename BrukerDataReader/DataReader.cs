@@ -5,6 +5,8 @@ using System.IO;
 namespace BrukerDataReader
 {
 
+
+
     //TODO:  add apodization ability
     //TODO:  remove all dependence on DeconEngine  (FFT, apodization, etc).
 
@@ -17,6 +19,9 @@ namespace BrukerDataReader
         long _previousStartPosition = 0;
         long _bytesAdvanced = 0;
         long _lengthOfDataFileInBytes = 0;
+
+
+        private FourierTransform _fourierTransform = new FourierTransform();
 
         /// <summary>
         /// Constructor for the DataReader class
@@ -109,7 +114,7 @@ namespace BrukerDataReader
                 _reader = new BinaryReader(File.Open(_fileName, FileMode.Open));
             }
 
-            float[] vals = new float[Parameters.NumValuesInScan];
+            var vals = new double[Parameters.NumValuesInScan];
             int diffBetweenCurrentAndPreviousScan = scanNum - _lastScanOpened;
 
             long byteOffset = (long)diffBetweenCurrentAndPreviousScan * (long)Parameters.NumValuesInScan * (long)sizeof(Int32) - _bytesAdvanced;
@@ -131,7 +136,7 @@ namespace BrukerDataReader
             float[] mzValuesFullRange = new float[lengthOfMZAndIntensityArray];
             float[] intensitiesFullRange = new float[lengthOfMZAndIntensityArray];
 
-            DeconEngine.Utils.FourierTransform(ref vals);
+            _fourierTransform.RealFourierTransform(ref vals);
 
             for (int i = 0; i < lengthOfMZAndIntensityArray; i++)
             {
@@ -258,14 +263,14 @@ namespace BrukerDataReader
             //Check.Require(scanNum < GetNumMSScans(), "Cannot get mass spectrum. Requested scan num is greater than number of scans in dataset.");
 
       
-            var scanDataList = new List<float[]>();
+            var scanDataList = new List<double[]>();
 
             using (var reader = new BinaryReader(File.Open(_fileName, FileMode.Open)))
             {
 
                 foreach (var scanNum in scanNumsToBeSummed)
                 {
-                    var vals = new float[Parameters.NumValuesInScan];
+                    var vals = new double[Parameters.NumValuesInScan];
 
                     long bytePosition = (long)scanNum * (long)Parameters.NumValuesInScan * (long)sizeof(Int32);
 
@@ -291,8 +296,8 @@ namespace BrukerDataReader
 
             for (int i = 0; i < scanDataList.Count; i++)
             {
-                float[] vals = scanDataList[i];
-                DeconEngine.Utils.FourierTransform(ref vals);
+                double[] vals = scanDataList[i];
+                 _fourierTransform.RealFourierTransform(ref vals);
 
                 for (int j = 0; j < lengthOfMZAndIntensityArray; j++)
                 {
