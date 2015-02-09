@@ -9,16 +9,23 @@ namespace BrukerDataReader.UnitTests
     {
 
 
-        public static void DisplayXYValues(float[] xvalues, float[] yvalues)
+        public static void DisplayXYValues(float[] xvalues, float[] yvalues, int numPointsToShow = 0, float mzStart = float.MinValue, float mzEnd = float.MaxValue)
         {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
 
-            for (int i = 0; i < xvalues.Length; i++)
+            int actualNumPointsToShow = xvalues.Length;
+            if (numPointsToShow > 0)
+                actualNumPointsToShow = numPointsToShow;
+
+            for (int i = 0; i < actualNumPointsToShow; i++)
             {
-                sb.Append(xvalues[i]);
-                sb.Append('\t');
-                sb.Append(yvalues[i]);
-                sb.Append(Environment.NewLine);
+                if (xvalues[i] >= mzStart && xvalues[i] <= mzEnd)
+                {
+                    sb.Append(xvalues[i]);
+                    sb.Append('\t');
+                    sb.Append(yvalues[i]);
+                    sb.Append(Environment.NewLine);
+                }
             }
             Console.Write(sb.ToString());
         }

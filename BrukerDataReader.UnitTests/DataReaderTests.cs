@@ -134,11 +134,16 @@ namespace BrukerDataReader.UnitTests
         [Test]
         public void GetMassSpectrum_Bruker15T_Test1()
         {
-            DataReader reader = new DataReader(FileRefs.Bruker15TFile1);
-            reader.Parameters.CalA = 230337466.449292;
-            reader.Parameters.CalB = 7.00924491472374;
-            reader.Parameters.SampleRate = 1153846.15384615;
-            reader.Parameters.NumValuesInScan = 524288;
+            var reader = new DataReader(FileRefs.Bruker15TFile1)
+            {
+                Parameters =
+                {
+                    CalA = 230337466.449292,                // ML1
+                    CalB = 7.00924491472374,                // ML2
+                    SampleRate = 576923.0769230769 * 2,     // SW_h
+                    NumValuesInScan = 524288                // TD
+                }
+            };
 
             Assert.AreEqual(18, reader.GetNumMSScans());
 
@@ -149,11 +154,67 @@ namespace BrukerDataReader.UnitTests
             reader.GetMassSpectrum(testScan, ref mzvals, ref intensities);
             Assert.AreEqual(789.9679m, (decimal)mzvals[129658]);
 
-            //            TestUtilities.DisplayXYValues(mzvals, intensities);
+            TestUtilities.DisplayXYValues(mzvals, intensities, 0, 714, 717);
 
+            TestUtilities.DisplayXYValues(mzvals, intensities, 0, 857, 858);
 
         }
 
+        [Test]
+        public void GetMassSpectrum_Bruker15T_Test2()
+        {
+            var reader = new DataReader(FileRefs.Bruker15TFile2)
+            {
+                Parameters =
+                {
+                    CalA = 230344000.2436387,                // ML1
+                    CalB = 8.3640041691183,                  // ML2
+                    SampleRate = 2500000 * 2,                // SW_h
+                    NumValuesInScan = 4194304                // TD
+                }
+            };
+
+            Assert.AreEqual(21, reader.GetNumMSScans());
+
+
+            float[] mzvals = null;
+            float[] intensities = null;
+            int testScan = 10;
+            reader.GetMassSpectrum(testScan, ref mzvals, ref intensities);
+            Assert.AreEqual(375.6136m, (decimal)mzvals[129658]);
+
+            TestUtilities.DisplayXYValues(mzvals, intensities, 0, 428, 429);
+
+        }
+        [Test]
+        public void GetMassSpectrum_Bruker15T_Test3()
+        {
+
+            var reader = new DataReader(FileRefs.Bruker15T_FID_File1)
+            {
+                // The parameters come from file apexAcquisition.method
+                Parameters =
+                {
+                    CalA = 230343708.8145794,                // ML1
+                    CalB = -14.171275734034667,              // ML2
+                    SampleRate = 288461.53846153844 * 2,     // SW_h
+                    NumValuesInScan = 524288                 // TD
+                }
+            };
+
+            Assert.AreEqual(1, reader.GetNumMSScans());
+
+
+            float[] mzvals = null;
+            float[] intensities = null;
+            int testScan = 0;
+            reader.GetMassSpectrum(testScan, ref mzvals, ref intensities);
+            Assert.AreEqual(1580.17m, (decimal)mzvals[129658]);
+
+            TestUtilities.DisplayXYValues(mzvals, intensities, 0, 850, 865);
+
+
+        }
 
 
 

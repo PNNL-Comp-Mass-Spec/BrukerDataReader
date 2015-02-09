@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -81,20 +82,22 @@ namespace BrukerDataReader
         public int GetNumMSScans()
         {
 
-            //determine if the numMSScans was already stored or not. If not, open file and figure it out.
-            bool numScansNotYetDetermined = (_numMSScans == -1);
-
-            if (numScansNotYetDetermined)
+            // If numMSScans was already stored, then return it
+            if (_numMSScans != -1)
             {
-                Check.Require(this.Parameters != null && this.Parameters.NumValuesInScan > 0, "Cannot determine number of MS Scans. Parameter for number of points in Scan has not been set.");
+                return _numMSScans;
+            }
 
-                using (var reader = new BinaryReader(File.Open(_fileName, FileMode.Open)))
-                {
-                    long fileLength = reader.BaseStream.Length;
-                    var totalNumberOfValues = fileLength / sizeof(Int32);
+            // Determine the number of scans using the file length
 
-                    if (Parameters != null) _numMSScans = (int)(totalNumberOfValues / Parameters.NumValuesInScan);
-                }
+            Check.Require(this.Parameters != null && this.Parameters.NumValuesInScan > 0, "Cannot determine number of MS Scans. Parameter for number of points in Scan has not been set.");
+
+            using (var reader = new BinaryReader(File.Open(_fileName, FileMode.Open)))
+            {
+                long fileLength = reader.BaseStream.Length;
+                var totalNumberOfValues = fileLength / sizeof(Int32);
+
+                if (Parameters != null) _numMSScans = (int)(totalNumberOfValues / Parameters.NumValuesInScan);
             }
             return _numMSScans;
         }
@@ -356,8 +359,7 @@ namespace BrukerDataReader
         {
             foreach (var scanNum in scanNumsToBeSummed)
             {
-                Check.Require(scanNum < GetNumMSScans(),"Cannot get mass spectrum. Requested scan num (" + scanNum+ ") is greater than number of scans in dataset.");
-                
+                Check.Require(scanNum < GetNumMSScans(),"Cannot get mass spectrum. Requested scan num (" + scanNum + ") is greater than number of scans in dataset. Note that the first scan is scan 0");                
             }
         }
 
