@@ -76,6 +76,8 @@ namespace BrukerDataReader
             sb.Append("TD =     " + NumValuesInScan + Environment.NewLine);
             sb.Append("MZ_min = " + AcquiredMZMinimum.ToString("0.000") + Environment.NewLine);
             sb.Append("MZ_max = " + AcquiredMZMaximum.ToString("0.000") + Environment.NewLine);
+
+            Console.WriteLine(sb.ToString());
         }
 
         private void setDefaults()
