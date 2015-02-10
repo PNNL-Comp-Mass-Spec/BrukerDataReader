@@ -11,57 +11,82 @@ namespace BrukerDataReader
         /// <summary>
         /// Calibration value A
         /// </summary>
-        public double CalA { get; set; }
+        /// <remarks>Previously CalA</remarks>
+        public double ML1 { get; set; }
 
         /// <summary>
         /// Calibration value B
         /// </summary>
-        public double CalB { get; set; }
+        /// <remarks>Previously CalB</remarks>
+        public double ML2 { get; set; }
 
         /// <summary>
         /// The number of individual values in a scan. For FTMS, typically this is a power of 2.
         /// e.g.  if there are 8 values, this translates to 4 XY datapoints
         /// </summary>
+        /// <remarks>TD</remarks>
         public int NumValuesInScan { get; set; }
 
         /// <summary>
-        /// TODO: Define this.   SampleRate is key for figuring out m/z values
+        /// Sampling rate; not sure of the units.  A key for figuring out m/z values
         /// </summary>
+        /// <remarks>SW_h * 2</remarks>
         public double SampleRate { get; set; }
 
         /// <summary>
-        /// Minimum m/z value reported. Datareader will trim the low m/z values accordingly.
+        /// Minimum m/z value for the acquired data
         /// </summary>
-        public float MinMZ { get; set; }
+        public double AcquiredMZMinimum { get; set; }
 
         /// <summary>
-        /// Maximum m/z value reported. Datareader will trim the high m/z values accordingly.
+        /// Maximum m/z value for the acquired data
         /// </summary>
-        public float MaxMZ { get; set; }
+        public double AcquiredMZMaximum { get; set; }
 
+        /// <summary>
+        /// Last minimum m/z value specified when calling GetMassSpectrum()
+        /// </summary>
+        public float MinMZfilter { get; set; }
+
+        /// <summary>
+        /// Last maximum m/z value specified when calling GetMassSpectrum()
+        /// </summary>
+        public float MaxMZfilter { get; set; }
+    
         public GlobalParameters()
         {
             setDefaults();
         }
 
-        public GlobalParameters(double calA, double calB, double sampleRate, int numValuesInScan)
+        public GlobalParameters(double ml1, double ml2, double sampleRate, int numValuesInScan)
             : this()
         {
-            this.CalA = calA;
-            this.CalB = calB;
+            this.ML1 = ml1;
+            this.ML2 = ml2;
             this.SampleRate = sampleRate;
             this.NumValuesInScan = numValuesInScan;
         }
 
+        public void Display()
+        {
+            var sb = new StringBuilder();
+            sb.Append("ML1 =    " + ML1.ToString("0.000") + Environment.NewLine);
+            sb.Append("ML2 =    " + ML2.ToString("0.000") + Environment.NewLine);
+            sb.Append("SW_h =   " + SampleRate.ToString("0.000") + Environment.NewLine);
+            sb.Append("TD =     " + NumValuesInScan + Environment.NewLine);
+            sb.Append("MZ_min = " + AcquiredMZMinimum.ToString("0.000") + Environment.NewLine);
+            sb.Append("MZ_max = " + AcquiredMZMaximum.ToString("0.000") + Environment.NewLine);
+        }
+
         private void setDefaults()
         {
-            CalA = -1;
-            CalB = -1;
+            ML1 = -1;
+            ML2 = -1;
             NumValuesInScan = 0;
             SampleRate = -1;
 
-            MinMZ = 300;
-            MaxMZ = 2000;
+            MinMZfilter = 300;
+            MaxMZfilter = 2000;
         }
 
     }

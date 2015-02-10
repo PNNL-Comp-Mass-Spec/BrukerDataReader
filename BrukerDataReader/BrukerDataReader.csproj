@@ -50,6 +50,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BrukerSettingsFileReader.cs" />
     <Compile Include="DataReader.cs" />
     <Compile Include="DesignByContract.cs" />
     <Compile Include="FourierTransform.cs" />

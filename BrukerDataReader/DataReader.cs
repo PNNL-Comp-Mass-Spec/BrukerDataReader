@@ -5,36 +5,34 @@ using System.IO;
 
 namespace BrukerDataReader
 {
-
-
+    
 
     //TODO:  add apodization ability
     //TODO:  remove all dependence on DeconEngine  (FFT, apodization, etc).
 
     public class DataReader : IDisposable
     {
-        string _fileName = "";
+
+        readonly string _fileName = "";
         int _numMSScans = -1;
-        int _lastScanOpened = 0;
+        int _lastScanOpened;
         BinaryReader _reader;
-        long _previousStartPosition = 0;
-        long _bytesAdvanced = 0;
-        long _lengthOfDataFileInBytes = 0;
+        Int64 _previousStartPosition;
+        Int64 _bytesAdvanced;
+        readonly Int64 _lengthOfDataFileInBytes;
 
 
-        private FourierTransform _fourierTransform = new FourierTransform();
+        private readonly FourierTransform _fourierTransform = new FourierTransform();
 
         /// <summary>
         /// Constructor for the DataReader class
         /// </summary>
         /// <param name="fileName">Refers to the binary file containing the mass spectra data. For Bruker data, 
         /// this is a 'ser' or a 'fid' file</param>
-        public DataReader(string fileName)
+        /// <param name="settingsFilePath">Path to the acqus or apexAcquisition.method file that should be used for reading parameters</param>
+        public DataReader(string fileName, string settingsFilePath = "")
         {
-            Parameters = new GlobalParameters();
-
-            var fileExists = File.Exists(fileName);
-
+            
             if (File.Exists(fileName))
             {
                 _fileName = fileName;
@@ -44,13 +42,19 @@ namespace BrukerDataReader
                 throw new FileNotFoundException("Dataset could not be opened. File not found.");
             }
 
-
             using (var reader = new BinaryReader(File.Open(_fileName, FileMode.Open)))
             {
                 _lengthOfDataFileInBytes = reader.BaseStream.Length;
             }
 
-
+            if (string.IsNullOrEmpty(settingsFilePath))
+            {
+                Parameters = new GlobalParameters();
+            } 
+            else
+            {
+                LoadParameters(settingsFilePath);
+            }
 
         }
 
@@ -69,9 +73,39 @@ namespace BrukerDataReader
 
         #region Public Methods
 
+        /// <summary>
+        /// Load the paramters from an acqus file or apexAcquisition.method file
+        /// </summary>
+        /// <param name="settingsFilePath"></param>
+        public void LoadParameters(string settingsFilePath)
+        {
+            var fiSettingsFile = new FileInfo(settingsFilePath);
+
+            if (!fiSettingsFile.Exists)
+                throw new FileNotFoundException("Settings file not found");
+
+            var filenameLower = fiSettingsFile.Name.ToLower();
+            var reader = new BrukerSettingsFileReader();
+
+            switch (filenameLower)
+            {
+                case "acqu":
+                case "acqus":
+                    Parameters = reader.LoadApexAcqusParameters(fiSettingsFile);
+                    break;
+                case "apexacquisition.method":
+                    Parameters = reader.LoadApexAcqParameters(fiSettingsFile);
+                    break;
+                default:
+                    throw new Exception("Unrecognized settings file (" + fiSettingsFile.Name + "); should be acqus or apexAcquisition.method");
+            }
+
+        }
+
+       
         public void SetParameters(double calA, double calB, double sampleRate, int numValuesInScan)
         {  
-            this.Parameters = new GlobalParameters { CalA = calA, CalB = calB, SampleRate = sampleRate, NumValuesInScan = numValuesInScan };
+            this.Parameters = new GlobalParameters { ML1 = calA, ML2 = calB, SampleRate = sampleRate, NumValuesInScan = numValuesInScan };
         }
 
         public void SetParameters(GlobalParameters gp)
@@ -94,7 +128,7 @@ namespace BrukerDataReader
 
             using (var reader = new BinaryReader(File.Open(_fileName, FileMode.Open)))
             {
-                long fileLength = reader.BaseStream.Length;
+                Int64 fileLength = reader.BaseStream.Length;
                 var totalNumberOfValues = fileLength / sizeof(Int32);
 
                 if (Parameters != null) _numMSScans = (int)(totalNumberOfValues / Parameters.NumValuesInScan);
@@ -107,8 +141,11 @@ namespace BrukerDataReader
         /// by using a relative position within the reader.  It turns out to be only ~3-4% faster. 
         /// </summary>
         /// <param name="scanNum">Zero-based scan number</param>
-        public void GetMassSpectrumUsingSupposedlyFasterBinaryReader(int scanNum, ref float[] mzValues, ref float[] intensities)
-        {
+        /// <param name="mzValues">array of m/z values</param>
+        /// <param name="intensities">Array of intensity values</param>
+        public void GetMassSpectrumUsingSupposedlyFasterBinaryReader(int scanNum, out float[] mzValues, out float[] intensities)
+        {            
+
             Check.Require(Parameters != null, "Cannot get mass spectrum. Need to first set Parameters.");
             Check.Require(scanNum < GetNumMSScans(), "Cannot get mass spectrum. Requested scan num is greater than number of scans in dataset.");
 
@@ -120,7 +157,7 @@ namespace BrukerDataReader
             var vals = new double[Parameters.NumValuesInScan];
             int diffBetweenCurrentAndPreviousScan = scanNum - _lastScanOpened;
 
-            long byteOffset = (long)diffBetweenCurrentAndPreviousScan * (long)Parameters.NumValuesInScan * (long)sizeof(Int32) - _bytesAdvanced;
+            Int64 byteOffset = (Int64)diffBetweenCurrentAndPreviousScan * (Int64)Parameters.NumValuesInScan * (Int64)sizeof(Int32) - _bytesAdvanced;
 
             if (byteOffset != 0)
             {
@@ -136,26 +173,24 @@ namespace BrukerDataReader
             _bytesAdvanced = _reader.BaseStream.Position - _previousStartPosition;
 
             int lengthOfMZAndIntensityArray = Parameters.NumValuesInScan / 2;
-            float[] mzValuesFullRange = new float[lengthOfMZAndIntensityArray];
-            float[] intensitiesFullRange = new float[lengthOfMZAndIntensityArray];
+            var mzValuesFullRange = new float[lengthOfMZAndIntensityArray];
+            var intensitiesFullRange = new float[lengthOfMZAndIntensityArray];
 
             _fourierTransform.RealFourierTransform(ref vals);
 
             for (int i = 0; i < lengthOfMZAndIntensityArray; i++)
             {
-                float mz = (float)getMZ(i);
-                float intensity = (float)(Math.Sqrt(vals[2 * i + 1] * vals[2 * i + 1] + vals[2 * i] * vals[2 * i]));
+                var mz = (float)getMZ(i);
+                var intensity = (float)(Math.Sqrt(vals[2 * i + 1] * vals[2 * i + 1] + vals[2 * i] * vals[2 * i]));
 
                 int indexForReverseInsertion = (lengthOfMZAndIntensityArray - i - 1);
                 mzValuesFullRange[indexForReverseInsertion] = mz;
                 intensitiesFullRange[indexForReverseInsertion] = intensity;
             }
 
-            //trim off m/z values according to parameters
-            int indexOfLowMZ = getIndexForMZ(Parameters.MinMZ, lengthOfMZAndIntensityArray);
-            int indexOfHighMZ = getIndexForMZ(Parameters.MaxMZ, lengthOfMZAndIntensityArray);
-
-
+            // Trim off m/z values according to parameters
+            var indexOfLowMZ = getIndexForMZ(Parameters.MinMZfilter, lengthOfMZAndIntensityArray);
+            var indexOfHighMZ = getIndexForMZ(Parameters.MaxMZfilter, lengthOfMZAndIntensityArray);
 
             mzValues = new float[indexOfHighMZ - indexOfLowMZ];
             intensities = new float[indexOfHighMZ - indexOfLowMZ];
@@ -178,75 +213,23 @@ namespace BrukerDataReader
         /// <param name="scanNum">Zero-based scan number</param>
         /// <param name="mzValues">m/z values are returned here</param>
         /// <param name="intensities">intensity values are returned here</param>
-        public void GetMassSpectrum(int scanNum, ref float[] mzValues, ref float[] intensities)
+        public void GetMassSpectrum(int scanNum, out float[] mzValues, out float[] intensities)
         {
-            int[] scanNums = new int[] { scanNum };
+            var scanNums = new int[] { scanNum };
 
-            GetMassSpectrum(scanNums, ref mzValues, ref intensities);
-
-            //Delete this after confirming correctness
-            //Check.Require(Parameters != null && Parameters.CalA != -1, "Cannot get mass spectrum. Need to first set Parameters.");
- 
-            //float[] vals = new float[Parameters.NumValuesInScan];
-
-            //using (BinaryReader reader = new BinaryReader(File.Open(m_fileName, FileMode.Open)))
-            //{
-            //    long bytePosition = (long)scanNum * (long)Parameters.NumValuesInScan * (long)sizeof(Int32);
-
-            //    reader.BaseStream.Seek(bytePosition, SeekOrigin.Begin);
-            //    for (int i = 0; i < Parameters.NumValuesInScan; i++)
-            //    {
-            //        vals[i] = reader.ReadInt32();
-            //    }
-
-            //    reader.Close();
-            //}
-
-            //int lengthOfMZAndIntensityArray = Parameters.NumValuesInScan / 2;
-            //float[] mzValuesFullRange = new float[lengthOfMZAndIntensityArray];
-            //float[] intensitiesFullRange = new float[lengthOfMZAndIntensityArray];
-
-            //DeconEngine.Utils.FourierTransform(ref vals);
-
-            //for (int i = 0; i < lengthOfMZAndIntensityArray; i++)
-            //{
-            //    float mz = (float)getMZ(i);
-            //    float intensity = (float)(Math.Sqrt(vals[2 * i + 1] * vals[2 * i + 1] + vals[2 * i] * vals[2 * i]));
-
-            //    int indexForReverseInsertion = (lengthOfMZAndIntensityArray - i - 1);
-            //    mzValuesFullRange[indexForReverseInsertion] = mz;
-            //    intensitiesFullRange[indexForReverseInsertion] = intensity;
-            //}
-
-            ////trim off m/z values according to parameters
-            //int indexOfLowMZ = getIndexForMZ(Parameters.MinMZ, lengthOfMZAndIntensityArray);
-            //int indexOfHighMZ = getIndexForMZ(Parameters.MaxMZ, lengthOfMZAndIntensityArray);
-
-
-
-            //mzValues = new float[indexOfHighMZ - indexOfLowMZ];
-            //intensities = new float[indexOfHighMZ - indexOfLowMZ];
-
-            //for (int i = indexOfLowMZ; i < indexOfHighMZ; i++)
-            //{
-            //    mzValues[i - indexOfLowMZ] = mzValuesFullRange[i];
-            //    intensities[i - indexOfLowMZ] = intensitiesFullRange[i];
-            //}
-
-
+            GetMassSpectrum(scanNums, out mzValues, out intensities);         
         }
 
 
-        public void GetMassSpectrum(int scanNum, float minMZ, float maxMZ, ref float[] mzValues, ref float[] intensities)
+        public void GetMassSpectrum(int scanNum, float minMZ, float maxMZ, out float[] mzValues, out float[] intensities)
         {
-            Check.Require(Parameters != null && Parameters.CalA != -1, "Cannot get mass spectrum. Need to first set Parameters.");
+            Check.Require(Parameters != null && Parameters.ML1 > -1, "Cannot get mass spectrum. Need to first set Parameters.");
             Check.Require(maxMZ >= minMZ, "Cannot get mass spectrum. MinMZ is greater than MaxMZ - that's impossible.");
 
+            Parameters.MinMZfilter = minMZ;
+            Parameters.MaxMZfilter = maxMZ;
 
-            Parameters.MinMZ = minMZ;
-            Parameters.MaxMZ = maxMZ;
-
-            GetMassSpectrum(scanNum, ref mzValues, ref intensities);
+            GetMassSpectrum(scanNum, out mzValues, out intensities);
         }
 
 
@@ -254,17 +237,14 @@ namespace BrukerDataReader
         /// Gets the summed mass spectrum.
         /// </summary>
         /// <param name="scanNumsToBeSummed"></param>
-        /// <param name="minMZ"></param>
-        /// <param name="maxMZ"></param>
         /// <param name="mzValues"></param>
         /// <param name="intensities"></param>
-        public void GetMassSpectrum(int[] scanNumsToBeSummed, ref float[] mzValues, ref float[] intensities)
+        public void GetMassSpectrum(int[] scanNumsToBeSummed, out float[] mzValues, out float[] intensities)
         {
-            Check.Require(Parameters != null && Parameters.CalA != -1, "Cannot get mass spectrum. Need to first set Parameters.");
+            Check.Require(Parameters != null && Parameters.ML1 != -1, "Cannot get mass spectrum. Need to first set Parameters.");
 
             validateScanNums(scanNumsToBeSummed);
             //Check.Require(scanNum < GetNumMSScans(), "Cannot get mass spectrum. Requested scan num is greater than number of scans in dataset.");
-
       
             var scanDataList = new List<double[]>();
 
@@ -275,7 +255,7 @@ namespace BrukerDataReader
                 {
                     var vals = new double[Parameters.NumValuesInScan];
 
-                    long bytePosition = (long)scanNum * (long)Parameters.NumValuesInScan * (long)sizeof(Int32);
+                    Int64 bytePosition = (Int64)scanNum * (Int64)Parameters.NumValuesInScan * (Int64)sizeof(Int32);
 
                     reader.BaseStream.Seek(bytePosition, SeekOrigin.Begin);
                     for (int i = 0; i < Parameters.NumValuesInScan; i++)
@@ -320,10 +300,9 @@ namespace BrukerDataReader
 
             }
 
-            //trim off m/z values according to parameters
-            var indexOfLowMZ = getIndexForMZ(Parameters.MinMZ, lengthOfMZAndIntensityArray);
-            var indexOfHighMZ = getIndexForMZ(Parameters.MaxMZ, lengthOfMZAndIntensityArray);
-
+            // Trim off m/z values according to parameters
+            var indexOfLowMZ = getIndexForMZ(Parameters.MinMZfilter, lengthOfMZAndIntensityArray);
+            var indexOfHighMZ = getIndexForMZ(Parameters.MaxMZfilter, lengthOfMZAndIntensityArray);
 
             mzValues = new float[indexOfHighMZ - indexOfLowMZ];
             intensities = new float[indexOfHighMZ - indexOfLowMZ];
@@ -334,28 +313,22 @@ namespace BrukerDataReader
                 intensities[i - indexOfLowMZ] = intensitiesFullRange[i];
             }
 
-
-
-
         }
 
 
-        public void GetMassSpectrum(int[] scansNumsToBeSummed, float minMZ, float maxMZ, ref float[] mzValues, ref float[] intensities)
+        public void GetMassSpectrum(int[] scansNumsToBeSummed, float minMZ, float maxMZ, out float[] mzValues, out float[] intensities)
         {
             Check.Require(maxMZ >= minMZ, "Cannot get mass spectrum. MinMZ is greater than MaxMZ - that's impossible.");
 
+            Parameters.MinMZfilter = minMZ;
+            Parameters.MaxMZfilter = maxMZ;
 
-            Parameters.MinMZ = minMZ;
-            Parameters.MaxMZ = maxMZ;
-
-            GetMassSpectrum(scansNumsToBeSummed, ref mzValues, ref intensities);
+            GetMassSpectrum(scansNumsToBeSummed, out mzValues, out intensities);
 
         }
 
 
-
-
-        private void validateScanNums(int[] scanNumsToBeSummed)
+        private void validateScanNums(IEnumerable<int> scanNumsToBeSummed)
         {
             foreach (var scanNum in scanNumsToBeSummed)
             {
@@ -364,46 +337,40 @@ namespace BrukerDataReader
         }
 
 
-
-
-
-
         #endregion
 
         #region Private Methods
 
         private int getIndexForMZ(float targetMZ, int arrayLength)
         {
-            int index = (int)((Parameters.NumValuesInScan / Parameters.SampleRate) * (Parameters.CalA / targetMZ - Parameters.CalB));
+            var index = (int)((Parameters.NumValuesInScan / Parameters.SampleRate) * (Parameters.ML1 / targetMZ - Parameters.ML2));
             index = arrayLength - index;
 
             if (index < 0)
             {
                 return 0;
             }
-            else if (index > arrayLength - 1)
+            
+            if (index > arrayLength - 1)
             {
                 return arrayLength - 1;
             }
-            else
-            {
-                return index;
-            }
-
+            
+            return index;
         }
 
         private double getMZ(int i)
         {
             double freq = i * Parameters.SampleRate / Parameters.NumValuesInScan;
 
-            double mass = 0;
-            if (freq + Parameters.CalB != 0)
+            double mass;
+            if (Math.Abs(freq + Parameters.ML2) > 0)
             {
-                mass = Parameters.CalA / (freq + Parameters.CalB);
+                mass = Parameters.ML1 / (freq + Parameters.ML2);
             }
-            else if (freq - Parameters.CalB <= 0)
+            else if (freq - Parameters.ML2 <= 0)
             {
-                mass = Parameters.CalA;
+                mass = Parameters.ML1;
             }
             else
             {
@@ -411,7 +378,8 @@ namespace BrukerDataReader
             }
             return mass;
         }
-        internal long GetLengthOfDataFileInBytes()
+
+        internal Int64 GetLengthOfDataFileInBytes()
         {
             return _lengthOfDataFileInBytes;
         }
