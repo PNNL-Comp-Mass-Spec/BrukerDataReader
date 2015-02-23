@@ -42,7 +42,7 @@ namespace BrukerDataReader
                 throw new FileNotFoundException("Dataset could not be opened. File not found.");
             }
 
-            using (var reader = new BinaryReader(File.Open(_fileName, FileMode.Open)))
+            using (var reader = new BinaryReader(File.Open(_fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
             {
                 _lengthOfDataFileInBytes = reader.BaseStream.Length;
             }
@@ -126,7 +126,7 @@ namespace BrukerDataReader
 
             Check.Require(this.Parameters != null && this.Parameters.NumValuesInScan > 0, "Cannot determine number of MS Scans. Parameter for number of points in Scan has not been set.");
 
-            using (var reader = new BinaryReader(File.Open(_fileName, FileMode.Open)))
+            using (var reader = new BinaryReader(File.Open(_fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
             {
                 Int64 fileLength = reader.BaseStream.Length;
                 var totalNumberOfValues = fileLength / sizeof(Int32);
@@ -151,7 +151,7 @@ namespace BrukerDataReader
 
             if (_reader == null)
             {
-                _reader = new BinaryReader(File.Open(_fileName, FileMode.Open));
+                _reader = new BinaryReader(File.Open(_fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
             }
 
             var vals = new double[Parameters.NumValuesInScan];
@@ -241,14 +241,14 @@ namespace BrukerDataReader
         /// <param name="intensities"></param>
         public void GetMassSpectrum(int[] scanNumsToBeSummed, out float[] mzValues, out float[] intensities)
         {
-            Check.Require(Parameters != null && Parameters.ML1 != -1, "Cannot get mass spectrum. Need to first set Parameters.");
+            Check.Require(Parameters != null && Math.Abs(Parameters.ML1 - (-1)) > Single.Epsilon, "Cannot get mass spectrum. Need to first set Parameters.");
 
             validateScanNums(scanNumsToBeSummed);
             //Check.Require(scanNum < GetNumMSScans(), "Cannot get mass spectrum. Requested scan num is greater than number of scans in dataset.");
       
             var scanDataList = new List<double[]>();
 
-            using (var reader = new BinaryReader(File.Open(_fileName, FileMode.Open)))
+            using (var reader = new BinaryReader(File.Open(_fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
             {
 
                 foreach (var scanNum in scanNumsToBeSummed)
