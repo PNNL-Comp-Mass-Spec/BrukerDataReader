@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
@@ -22,11 +21,11 @@ namespace BrukerDataReader
             var elementNames = (from n in node.Elements() select n.Name.LocalName);
             var attributeNames = (from n in node.Attributes() select n.Name.LocalName);
 
-            bool nameIsAnXMLElement = elementNames.Contains("name");
+            var nameIsAnXMLElement = elementNames.Contains("name");
 
-            bool nameIsAnAttribute = attributeNames.Contains("name");
+            var nameIsAnAttribute = attributeNames.Contains("name");
 
-            string nameValue = String.Empty;
+            var nameValue = String.Empty;
             if (nameIsAnXMLElement)
             {
                 var element = node.Element("name");
@@ -48,14 +47,14 @@ namespace BrukerDataReader
         {
             var elementNames = (from n in node.Elements() select n.Name.LocalName).ToList();
 
-            string fieldName = string.Empty;
+            var fieldName = string.Empty;
 
             if (elementNames.Contains("value") )
                 fieldName = "value";
             else if (elementNames.Contains("Value"))
                 fieldName = "Value";
 
-            string valueString = string.Empty;
+            var valueString = string.Empty;
 
             if (!string.IsNullOrWhiteSpace(fieldName))
             {
@@ -85,21 +84,45 @@ namespace BrukerDataReader
 
         public GlobalParameters LoadApexAcqParameters(FileInfo fiSettingsFile)
         {
-            XDocument xdoc = XDocument.Load(fiSettingsFile.FullName);
+            // Bruker's acquisition software will write out data like this to the apexAcquisition.method file
+            // if the user enters a sample description of "<2mg/mL  100mM  AA  SID35"
+            //
+            //   <sampledescription>&lt;<2mg/mL&#x20; 100mM&#x20; AA&#x20; SID35</sampledescription>
+            //
+            // The extra "<" after &lt; should not be there
+            // Its presence causes the XDocument.Load() event to fail
+            // Thus, we must pre-scrub the file prior to passing it to .Load()
+
             var paramList = new List<brukerNameValuePair>();
 
-           
-            var paramNodes = (from node in xdoc.Element("method").Element("paramlist").Elements() select node);
+            var tmpFilePath = PrescanApexAcqFile(fiSettingsFile.FullName);
 
-            foreach (var node in paramNodes)
+            using (var fileReader = new StreamReader(new FileStream(tmpFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
             {
-                var nameValuePair = new brukerNameValuePair
-                {
-                    Name = GetNameFromNode(node),
-                    Value = GetValueFromNode(node)
-                };
+                var xdoc = XDocument.Load(fileReader);
 
-                paramList.Add(nameValuePair);
+                var methodElement = xdoc.Element("method");
+
+                if (methodElement != null)
+                {
+                    var paramListElement = methodElement.Element("paramlist");
+
+                    if (paramListElement != null)
+                    {
+                        var paramNodes = (from node in paramListElement.Elements() select node);
+
+                        foreach (var node in paramNodes)
+                        {
+                            var nameValuePair = new brukerNameValuePair
+                            {
+                                Name = GetNameFromNode(node),
+                                Value = GetValueFromNode(node)
+                            };
+
+                            paramList.Add(nameValuePair);
+                        }
+                    }
+                }
             }
 
             var parameters = new GlobalParameters()
@@ -118,8 +141,59 @@ namespace BrukerDataReader
             // ByteOrder = Convert.ToInt32(GetDoubleFromParamList(paramList, "BYTORDP", 0))
             //this.CalibrationData.NF = Convert.ToInt32(getDoubleFromParamList(paramList, "NF", 0));
 
+            try
+            {
+                // Delete the temp file
+                File.Delete(tmpFilePath);
+            }
+            catch (Exception)
+            {
+                // Ignore exceptions
+            }
+
             return parameters;
 
+        }
+
+        private string PrescanApexAcqFile(string apexAcqFilePath)
+        {
+            // Look for 
+            //   &lt;<  
+            // but exclude matches to 
+            //   &lt;</
+
+            var reLessThanMatcher = new Regex(@"&lt;<(?!/)", RegexOptions.Compiled);
+
+            var fixedFilePath = Path.GetTempFileName();
+
+            using (var reader = new StreamReader(new FileStream(apexAcqFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
+            using (var writer = new StreamWriter(new FileStream(fixedFilePath, FileMode.Create, FileAccess.Write, FileShare.Read)))
+            {                
+                while (!reader.EndOfStream)
+                {
+                    var dataLine = reader.ReadLine();
+                    if (string.IsNullOrEmpty(dataLine))
+                    {
+                        writer.WriteLine();
+                        continue;
+                    }
+
+                    var reMatch = reLessThanMatcher.Match(dataLine);
+
+                    if (reMatch.Success)
+                    {
+                        writer.WriteLine(reLessThanMatcher.Replace(dataLine, "&lt;"));
+                    }
+                    else
+                    {
+                        writer.WriteLine(dataLine);
+                    }
+
+                }
+                
+            }
+            
+            return fixedFilePath;
         }
 
         public GlobalParameters LoadApexAcqusParameters(FileInfo fiSettingsFile)
@@ -131,21 +205,21 @@ namespace BrukerDataReader
             {
                 while (!sr.EndOfStream)
                 {
-                    string currentLine = sr.ReadLine();
+                    var currentLine = sr.ReadLine();
                     if (string.IsNullOrWhiteSpace(currentLine))
                         continue;
 
-                    Match match = Regex.Match(currentLine, @"^##\$(?<name>.*)=\s(?<value>[0-9-\.]+)");
+                    var match = Regex.Match(currentLine, @"^##\$(?<name>.*)=\s(?<value>[0-9-\.]+)");
 
                     if (!match.Success)
                     {
                         continue;
                     }
 
-                    string variableName = match.Groups["name"].Value;
+                    var variableName = match.Groups["name"].Value;
 
-                    double parsedResult = -1;
-                    bool canParseValue = double.TryParse(match.Groups["value"].Value, out parsedResult);
+                    double parsedResult;
+                    var canParseValue = double.TryParse(match.Groups["value"].Value, out parsedResult);
                     if (!canParseValue)
                     {
                         parsedResult = -1;
