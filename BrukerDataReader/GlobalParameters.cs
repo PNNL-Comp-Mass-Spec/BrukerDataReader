@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace BrukerDataReader
@@ -22,7 +20,7 @@ namespace BrukerDataReader
 
         /// <summary>
         /// The number of individual values in a scan. For FTMS, typically this is a power of 2.
-        /// e.g.  if there are 8 values, this translates to 4 XY datapoints
+        /// e.g.  if there are 8 values, this translates to 4 XY data points
         /// </summary>
         /// <remarks>TD</remarks>
         public int NumValuesInScan { get; set; }
@@ -46,27 +44,29 @@ namespace BrukerDataReader
         /// <summary>
         /// Last minimum m/z value specified when calling GetMassSpectrum()
         /// </summary>
-        public float MinMZfilter { get; set; }
+        public float MinMZFilter { get; set; }
 
         /// <summary>
         /// Last maximum m/z value specified when calling GetMassSpectrum()
         /// </summary>
-        public float MaxMZfilter { get; set; }
-    
+        public float MaxMZFilter { get; set; }
+
         public GlobalParameters()
         {
             setDefaults();
         }
 
+        // ReSharper disable once UnusedMember.Global
         public GlobalParameters(double ml1, double ml2, double sampleRate, int numValuesInScan)
             : this()
         {
-            this.ML1 = ml1;
-            this.ML2 = ml2;
-            this.SampleRate = sampleRate;
-            this.NumValuesInScan = numValuesInScan;
+            ML1 = ml1;
+            ML2 = ml2;
+            SampleRate = sampleRate;
+            NumValuesInScan = numValuesInScan;
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void Display()
         {
             var sb = new StringBuilder();
@@ -87,8 +87,8 @@ namespace BrukerDataReader
             NumValuesInScan = 0;
             SampleRate = -1;
 
-            MinMZfilter = 300;
-            MaxMZfilter = 2000;
+            MinMZFilter = 300;
+            MaxMZFilter = 2000;
         }
 
     }

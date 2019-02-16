@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace BrukerDataReader.UnitTests
+﻿namespace BrukerDataReader.UnitTests
 {
     public class FileRefs
     {

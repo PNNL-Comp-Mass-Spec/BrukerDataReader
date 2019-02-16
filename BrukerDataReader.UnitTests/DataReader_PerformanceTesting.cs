@@ -12,10 +12,10 @@ namespace BrukerDataReader.UnitTests
     {
         /// <summary>
         /// the test retrieves the same scan 20 times and ensures it is giving back the same value as the first scan retrieved.
-        /// I need this test to make sure I'm moving the byte pointer properly. 
+        /// I need this test to make sure I'm moving the byte pointer properly.
         /// </summary>
         [Test]
-        public void sameScanGivesSameValuesOverandOver_Test1()
+        public void sameScanGivesSameValuesOverAndOver_Test1()
         {
             var reader = new DataReader(FileRefs.Bruker_9T_ser_File1)
             {
@@ -30,35 +30,32 @@ namespace BrukerDataReader.UnitTests
 
             Assert.AreEqual(4275, reader.GetNumMSScans());
 
-            float[] mzvals;
-            float[] intensities;
-
             var timeList = new List<long>();
 
-            int scanNum = 1000;
-            reader.GetMassSpectrum(scanNum, out mzvals, out intensities);
+            var scanNum = 1000;
+            reader.GetMassSpectrum(scanNum, out var mzVals, out var intensities);
 
-            int testIndex = 100000;
+            var testIndex = 100000;
 
-            float testXVal = mzvals[testIndex];
-            float testYVal = intensities[testIndex];
+            var testXVal = mzVals[testIndex];
+            var testYVal = intensities[testIndex];
 
 
-            Stopwatch sw = new Stopwatch();
-            for (int i = 0; i < 20; i++)
+            var sw = new Stopwatch();
+            for (var i = 0; i < 20; i++)
             {
                 sw.Start();
 
                 Console.Write("scan= " + scanNum);
 
 
-                reader.GetMassSpectrum(scanNum, out mzvals, out intensities);
+                reader.GetMassSpectrum(scanNum, out mzVals, out intensities);
                 sw.Stop();
                 Console.WriteLine("; time= " + sw.ElapsedMilliseconds);
                 timeList.Add(sw.ElapsedMilliseconds);
                 sw.Reset();
 
-                Assert.AreEqual(testXVal, mzvals[testIndex]);
+                Assert.AreEqual(testXVal, mzVals[testIndex]);
                 Assert.AreEqual(testYVal, intensities[testIndex]);
 
             }
@@ -85,28 +82,19 @@ namespace BrukerDataReader.UnitTests
 
             Assert.AreEqual(4275, reader.GetNumMSScans());
 
-            float[] mzvals;
-            float[] intensities;
+            var timeList = new List<long>();
 
-            List<long> timeList = new List<long>();
+            var scanNum = 1000;
+            reader.GetMassSpectrum(scanNum, out _, out _);
 
-            int scanNum = 1000;
-            reader.GetMassSpectrum(scanNum, out mzvals, out intensities);
-
-            int testIndex = 100000;
-
-            float testXVal = mzvals[testIndex];
-            float testYVal = intensities[testIndex];
-
-
-            Stopwatch sw = new Stopwatch();
-            for (int i = 0; i < 100; i++)
+            var sw = new Stopwatch();
+            for (var i = 0; i < 100; i++)
             {
                 sw.Start();
 
-                int currentScan = scanNum + i;
+                var currentScan = scanNum + i;
                 Console.Write("scan= " + currentScan);
-                reader.GetMassSpectrum(currentScan, out mzvals, out intensities);
+                reader.GetMassSpectrum(currentScan, out _, out _);
                 sw.Stop();
                 Console.WriteLine("; time= " + sw.ElapsedMilliseconds);
                 timeList.Add(sw.ElapsedMilliseconds);
@@ -121,7 +109,7 @@ namespace BrukerDataReader.UnitTests
 
 
         }
-     
+
         [Test]
         public void consecutiveScans_SlowButSureTest1() // I find this to be about 3 to 10% slower than using a relative byte pointer
         {
@@ -138,35 +126,23 @@ namespace BrukerDataReader.UnitTests
 
             Assert.AreEqual(4275, reader.GetNumMSScans());
 
-            float[] mzvals;
-            float[] intensities;
+            var timeList = new List<long>();
 
-            List<long> timeList = new List<long>();
+            var scanNum = 1000;
+            reader.GetMassSpectrum(scanNum, out _, out _);
 
-            int scanNum = 1000;
-            reader.GetMassSpectrum(scanNum, out mzvals, out intensities);
-
-            int testIndex = 100000;
-
-            float testXVal = mzvals[testIndex];
-            float testYVal = intensities[testIndex];
-
-
-            Stopwatch sw = new Stopwatch();
-            for (int i = 0; i < 100; i++)
+            var sw = new Stopwatch();
+            for (var i = 0; i < 100; i++)
             {
                 sw.Start();
 
-                int currentScan = scanNum + i;
+                var currentScan = scanNum + i;
                 Console.Write("scan= " + currentScan);
-                reader.GetMassSpectrum(currentScan, out mzvals, out intensities);
+                reader.GetMassSpectrum(currentScan, out _, out _);
                 sw.Stop();
                 Console.WriteLine("; time= " + sw.ElapsedMilliseconds);
                 timeList.Add(sw.ElapsedMilliseconds);
                 sw.Reset();
-
-
-
             }
 
             Console.WriteLine("Average time = " + timeList.Average());
@@ -191,31 +167,22 @@ namespace BrukerDataReader.UnitTests
 
             Assert.AreEqual(4275, reader.GetNumMSScans());
 
-            float[] mzvals;
-            float[] intensities;
+            var timeList = new List<long>();
 
-            List<long> timeList = new List<long>();
+            var scanNum = 1000;
+            reader.GetMassSpectrum(scanNum, out _, out _);
 
-            int scanNum = 1000;
-            reader.GetMassSpectrum(scanNum, out mzvals, out intensities);
-
-            int testIndex = 100000;
-
-            float testXVal = mzvals[testIndex];
-            float testYVal = intensities[testIndex];
-
-
-            Stopwatch sw = new Stopwatch();
-            for (int i = 0; i < 100; i++)
+            var sw = new Stopwatch();
+            for (var i = 0; i < 100; i++)
             {
                 sw.Start();
 
-                int currentScan = scanNum + i;
+                var currentScan = scanNum + i;
 
                 int[] scansToBeSummed = { currentScan - 1, currentScan, currentScan + 1 };
 
                 Console.Write("scan= " + currentScan);
-                reader.GetMassSpectrum(scansToBeSummed, out mzvals, out intensities);
+                reader.GetMassSpectrum(scansToBeSummed, out _, out _);
                 sw.Stop();
                 Console.WriteLine("; time= " + sw.ElapsedMilliseconds);
                 timeList.Add(sw.ElapsedMilliseconds);
@@ -248,26 +215,23 @@ namespace BrukerDataReader.UnitTests
 
             Assert.AreEqual(4275, reader.GetNumMSScans());
 
-            float[] mzvals;
-            float[] intensities;
+            var timeList = new List<long>();
 
-            List<long> timeList = new List<long>();
-
-            int scanNum = 1000;
-            float minMZ = 695.5f;
-            float maxMZ = 696.9f;
+            var scanNum = 1000;
+            var minMZ = 695.5f;
+            var maxMZ = 696.9f;
 
 
-            reader.GetMassSpectrum(scanNum, minMZ, maxMZ, out mzvals, out intensities);
+            reader.GetMassSpectrum(scanNum, minMZ, maxMZ, out _, out _);
 
-            Stopwatch sw = new Stopwatch();
-            for (int i = 0; i < 100; i++)
+            var sw = new Stopwatch();
+            for (var i = 0; i < 100; i++)
             {
                 sw.Start();
 
-                int currentScan = scanNum + i;
+                var currentScan = scanNum + i;
                 Console.Write("scan= " + currentScan);
-                reader.GetMassSpectrum(currentScan, minMZ, maxMZ, out mzvals, out intensities);
+                reader.GetMassSpectrum(currentScan, minMZ, maxMZ, out _, out _);
                 sw.Stop();
                 Console.WriteLine("; time= " + sw.ElapsedMilliseconds);
                 timeList.Add(sw.ElapsedMilliseconds);

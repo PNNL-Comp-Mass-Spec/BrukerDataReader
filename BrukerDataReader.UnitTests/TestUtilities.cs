@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace BrukerDataReader.UnitTests
@@ -9,21 +7,26 @@ namespace BrukerDataReader.UnitTests
     {
 
 
-        public static void DisplayXYValues(float[] xvalues, float[] yvalues, int numPointsToShow = 0, float mzStart = float.MinValue, float mzEnd = float.MaxValue)
+        public static void DisplayXYValues(
+            float[] xValues,
+            float[] yValues,
+            int numPointsToShow = 0,
+            float mzStart = float.MinValue,
+            float mzEnd = float.MaxValue)
         {
             var sb = new StringBuilder();
 
-            int actualNumPointsToShow = xvalues.Length;
+            var actualNumPointsToShow = xValues.Length;
             if (numPointsToShow > 0)
                 actualNumPointsToShow = numPointsToShow;
 
-            for (int i = 0; i < actualNumPointsToShow; i++)
+            for (var i = 0; i < actualNumPointsToShow; i++)
             {
-                if (xvalues[i] >= mzStart && xvalues[i] <= mzEnd)
+                if (xValues[i] >= mzStart && xValues[i] <= mzEnd)
                 {
-                    sb.Append(xvalues[i]);
+                    sb.Append(xValues[i]);
                     sb.Append('\t');
-                    sb.Append(yvalues[i]);
+                    sb.Append(yValues[i]);
                     sb.Append(Environment.NewLine);
                 }
             }

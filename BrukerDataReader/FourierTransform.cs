@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace BrukerDataReader
 {
@@ -11,8 +8,8 @@ namespace BrukerDataReader
 
         public int RealFourierTransform(ref double[] data)
         {
-            int isign = 1;
-            int n = data.Length;
+            var isign = 1;
+            var n = data.Length;
 
             int i, i1, i2, i3, i4, n2p3;
             double c1 = 0.5, c2, hir, h1i, h2r, h2i;
@@ -92,9 +89,9 @@ namespace BrukerDataReader
             long mmax = 2;
             while (n > mmax)
             {
-                long istep = 2 * mmax;
+                var istep = 2 * mmax;
                 theta = 6.28318530717959 / (isign * mmax);
-                double wtemp = Math.Sin(0.5 * theta);
+                var wtemp = Math.Sin(0.5 * theta);
                 wpr = -2.0 * wtemp * wtemp;
                 wpi = Math.Sin(theta);
                 wr = 1.0;
@@ -104,10 +101,10 @@ namespace BrukerDataReader
                     for (i = m; i <= n; i += istep)
                     {
                         j = i + mmax;
-                        long jm1 = j - 1;
-                        long im1 = i - 1;
-                        double tempr = (wr * data[jm1] - wi * data[j]);
-                        double tempi = (wr * data[j] + wi * data[jm1]);
+                        var jm1 = j - 1;
+                        var im1 = i - 1;
+                        var tempr = (wr * data[jm1] - wi * data[j]);
+                        var tempi = (wr * data[j] + wi * data[jm1]);
                         data[jm1] = (data[im1] - tempr);
                         data[j] = (data[i] - tempi);
                         data[im1] += tempr;
@@ -126,8 +123,6 @@ namespace BrukerDataReader
             data[j] = data[i];
             data[i] = tempVal;
         }
-
-
 
         #region Constructors
         #endregion

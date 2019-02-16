@@ -10,7 +10,7 @@ namespace BrukerDataReader
     class BrukerSettingsFileReader
     {
 
-        struct brukerNameValuePair
+        struct BrukerNameValuePair
         {
             public string Name;
             public string Value;
@@ -25,7 +25,7 @@ namespace BrukerDataReader
 
             var nameIsAnAttribute = attributeNames.Contains("name");
 
-            var nameValue = String.Empty;
+            var nameValue = string.Empty;
             if (nameIsAnXMLElement)
             {
                 var element = node.Element("name");
@@ -37,13 +37,13 @@ namespace BrukerDataReader
             }
             else if (nameIsAnAttribute)
             {
-                nameValue = node.Attribute("name").Value;
+                nameValue = node.Attribute("name")?.Value;
             }
-          
+
             return nameValue;
         }
 
-        private string GetValueFromNode(XElement node)
+        private string GetValueFromNode(XContainer node)
         {
             var elementNames = (from n in node.Elements() select n.Name.LocalName).ToList();
 
@@ -65,11 +65,11 @@ namespace BrukerDataReader
                 }
 
             }
-         
+
             return valueString;
         }
 
-        private double GetDoubleFromParamList(IEnumerable<brukerNameValuePair> paramList, string paramName, double valueIfMissing)
+        private double GetDoubleFromParamList(IEnumerable<BrukerNameValuePair> paramList, string paramName, double valueIfMissing)
         {
             foreach (var item in paramList)
             {
@@ -93,34 +93,33 @@ namespace BrukerDataReader
             // Its presence causes the XDocument.Load() event to fail
             // Thus, we must pre-scrub the file prior to passing it to .Load()
 
-            var paramList = new List<brukerNameValuePair>();
+            var paramList = new List<BrukerNameValuePair>();
 
-            var tmpFilePath = PrescanApexAcqFile(fiSettingsFile.FullName);
+            var tmpFilePath = PreScanApexAcqFile(fiSettingsFile.FullName);
 
             using (var fileReader = new StreamReader(new FileStream(tmpFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
             {
-                var xdoc = XDocument.Load(fileReader);
+                var reader = XDocument.Load(fileReader);
 
-                var methodElement = xdoc.Element("method");
+                var methodElement = reader.Element("method");
 
-                if (methodElement != null)
+                // ReSharper disable once StringLiteralTypo
+                var paramListElement = methodElement?.Element("paramlist");
+
+                if (paramListElement != null)
                 {
-                    var paramListElement = methodElement.Element("paramlist");
+                    var paramNodes = (from node in paramListElement.Elements() select node);
 
-                    if (paramListElement != null)
+                    foreach (var node in paramNodes)
                     {
-                        var paramNodes = (from node in paramListElement.Elements() select node);
-
-                        foreach (var node in paramNodes)
+                        var nameValuePair = new BrukerNameValuePair
                         {
-                            var nameValuePair = new brukerNameValuePair
-                            {
-                                Name = GetNameFromNode(node),
-                                Value = GetValueFromNode(node)
-                            };
+                            Name = GetNameFromNode(node),
+                            Value = GetValueFromNode(node)
+                        };
 
+                        if (nameValuePair.Name != null)
                             paramList.Add(nameValuePair);
-                        }
                     }
                 }
             }
@@ -138,7 +137,10 @@ namespace BrukerDataReader
             // Additional parameters that may be of interest
 
             // FR_Low = GetDoubleFromParamList(paramList, "FR_low", 0),
+
+            // ReSharper disable once CommentTypo
             // ByteOrder = Convert.ToInt32(GetDoubleFromParamList(paramList, "BYTORDP", 0))
+
             //this.CalibrationData.NF = Convert.ToInt32(getDoubleFromParamList(paramList, "NF", 0));
 
             try
@@ -155,11 +157,11 @@ namespace BrukerDataReader
 
         }
 
-        private string PrescanApexAcqFile(string apexAcqFilePath)
+        private string PreScanApexAcqFile(string apexAcqFilePath)
         {
-            // Look for 
-            //   &lt;<  
-            // but exclude matches to 
+            // Look for
+            //   &lt;<
+            // but exclude matches to
             //   &lt;</
 
             var reLessThanMatcher = new Regex(@"&lt;<(?!/)", RegexOptions.Compiled);
@@ -168,7 +170,7 @@ namespace BrukerDataReader
 
             using (var reader = new StreamReader(new FileStream(apexAcqFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
             using (var writer = new StreamWriter(new FileStream(fixedFilePath, FileMode.Create, FileAccess.Write, FileShare.Read)))
-            {                
+            {
                 while (!reader.EndOfStream)
                 {
                     var dataLine = reader.ReadLine();
@@ -190,15 +192,15 @@ namespace BrukerDataReader
                     }
 
                 }
-                
+
             }
-            
+
             return fixedFilePath;
         }
 
         public GlobalParameters LoadApexAcqusParameters(FileInfo fiSettingsFile)
         {
-            
+
             var dataLookupTable = new Dictionary<string, double>();
 
             using (var sr = new StreamReader(fiSettingsFile.FullName))
@@ -218,8 +220,7 @@ namespace BrukerDataReader
 
                     var variableName = match.Groups["name"].Value;
 
-                    double parsedResult;
-                    var canParseValue = double.TryParse(match.Groups["value"].Value, out parsedResult);
+                    var canParseValue = double.TryParse(match.Groups["value"].Value, out var parsedResult);
                     if (!canParseValue)
                     {
                         parsedResult = -1;
@@ -234,17 +235,17 @@ namespace BrukerDataReader
             {
                 ML1 = dataLookupTable["ML1"],
                 ML2 = dataLookupTable["ML2"],
-                SampleRate = dataLookupTable["SW_h"] * 2, // From Gordon A.:  SW_h is the digitizer rate and Bruker entered it as the nyquist frequency so it needs to be multiplied by 2.
+                // From Gordon A.:  SW_h is the digitizer rate and Bruker entered it as the nyquist frequency so it needs to be multiplied by 2.
+                SampleRate = dataLookupTable["SW_h"] * 2,
                 NumValuesInScan = (int)dataLookupTable["TD"]
             };
 
-            double dataValue;
-            if (dataLookupTable.TryGetValue("EXC_low", out dataValue))
+            if (dataLookupTable.TryGetValue("EXC_low", out var dataValue))
                 parameters.AcquiredMZMinimum = dataValue;
 
             if (dataLookupTable.TryGetValue("EXC_hi", out dataValue))
                 parameters.AcquiredMZMaximum = dataValue;
-    
+
             return parameters;
         }
 

@@ -1,15 +1,14 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Diagnostics;
 
+// ReSharper disable UnusedMember.Global
 namespace BrukerDataReader
 {
 
-    public class CoverageExcludeAttribute : System.Attribute { }
+    public class CoverageExcludeAttribute : Attribute { }
 
     [CoverageExcludeAttribute]
-    public sealed class Check
+    public static class Check
     {
         #region Interface
 
@@ -195,20 +194,14 @@ namespace BrukerDataReader
         }
 
         /// <summary>
-        /// Set this if you wish to use Trace Assert statements 
-        /// instead of exception handling. 
+        /// Set this if you wish to use Trace Assert statements
+        /// instead of exception handling.
         /// (The Check class uses exception handling by default.)
         /// </summary>
         public static bool UseAssertions
         {
-            get
-            {
-                return useAssertions;
-            }
-            set
-            {
-                useAssertions = value;
-            }
+            get => useAssertions;
+            set => useAssertions = value;
         }
 
         #endregion // Interface
@@ -216,21 +209,15 @@ namespace BrukerDataReader
         #region Implementation
 
         // No creation
-        private Check() { }
 
         /// <summary>
         /// Is exception handling being used?
         /// </summary>
-        private static bool UseExceptions
-        {
-            get
-            {
-                return !useAssertions;
-            }
-        }
+        private static bool UseExceptions => !useAssertions;
 
-        // Are trace assertion statements being used? 
+        // Are trace assertion statements being used?
         // Default is to use exception handling.
+        // ReSharper disable once RedundantDefaultMemberInitializer
         private static bool useAssertions = false;
 
         #endregion // Implementation
@@ -241,9 +228,9 @@ namespace BrukerDataReader
 
     /// <summary>
     /// Exception raised when a contract is broken.
-    /// Catch this exception type if you wish to differentiate between 
+    /// Catch this exception type if you wish to differentiate between
     /// any DesignByContract exception and other runtime exceptions.
-    ///  
+    ///
     /// </summary>
     [CoverageExcludeAttribute]
     [Serializable]

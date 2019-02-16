@@ -5,10 +5,10 @@ using System.IO;
 
 namespace BrukerDataReader
 {
-    
+
 
     //TODO:  add apodization ability
-    //TODO:  remove all dependence on DeconEngine  (FFT, apodization, etc).
+    //TODO:  remove all dependence on DeconEngine (FFT, apodization, etc).
 
     public class DataReader : IDisposable
     {
@@ -17,22 +17,20 @@ namespace BrukerDataReader
         int _numMSScans = -1;
         int _lastScanOpened;
         BinaryReader _reader;
-        Int64 _previousStartPosition;
-        Int64 _bytesAdvanced;
-        readonly Int64 _lengthOfDataFileInBytes;
-
+        long _previousStartPosition;
+        long _bytesAdvanced;
 
         private readonly FourierTransform _fourierTransform = new FourierTransform();
 
         /// <summary>
         /// Constructor for the DataReader class
         /// </summary>
-        /// <param name="fileName">Refers to the binary file containing the mass spectra data. For Bruker data, 
+        /// <param name="fileName">Refers to the binary file containing the mass spectra data. For Bruker data,
         /// this is a 'ser' or a 'fid' file</param>
         /// <param name="settingsFilePath">Path to the acqus or apexAcquisition.method file that should be used for reading parameters</param>
         public DataReader(string fileName, string settingsFilePath = "")
         {
-            
+
             if (File.Exists(fileName))
             {
                 _fileName = fileName;
@@ -42,15 +40,15 @@ namespace BrukerDataReader
                 throw new FileNotFoundException("Dataset could not be opened. File not found.");
             }
 
-            using (var reader = new BinaryReader(File.Open(_fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
+            // Assure that the file can be opened
+            using (new BinaryReader(File.Open(_fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
             {
-                _lengthOfDataFileInBytes = reader.BaseStream.Length;
             }
 
             if (string.IsNullOrEmpty(settingsFilePath))
             {
                 Parameters = new GlobalParameters();
-            } 
+            }
             else
             {
                 LoadParameters(settingsFilePath);
@@ -63,18 +61,14 @@ namespace BrukerDataReader
 
         public GlobalParameters Parameters { get; set; }
 
-        public string FileName
-        {
-            get { return _fileName; }
-        }
-
+        public string FileName => _fileName;
 
         #endregion
 
         #region Public Methods
 
         /// <summary>
-        /// Load the paramters from an acqus file or apexAcquisition.method file
+        /// Load the parameters from an acqus file or apexAcquisition.method file
         /// </summary>
         /// <param name="settingsFilePath"></param>
         public void LoadParameters(string settingsFilePath)
@@ -102,9 +96,9 @@ namespace BrukerDataReader
 
         }
 
-       
+
         public void SetParameters(double calA, double calB, double sampleRate, int numValuesInScan)
-        {  
+        {
             Parameters = new GlobalParameters { ML1 = calA, ML2 = calB, SampleRate = sampleRate, NumValuesInScan = numValuesInScan };
         }
 
@@ -138,13 +132,14 @@ namespace BrukerDataReader
 
         /// <summary>
         /// Gets the mass spectrum.  Opens the BinaryReader and doesn't close it. Then finds the correct scan
-        /// by using a relative position within the reader.  It turns out to be only ~3-4% faster. 
+        /// by using a relative position within the reader.  It turns out to be only ~3-4% faster.
         /// </summary>
         /// <param name="scanNum">Zero-based scan number</param>
         /// <param name="mzValues">array of m/z values</param>
         /// <param name="intensities">Array of intensity values</param>
+        // ReSharper disable once UnusedMember.Global
         public void GetMassSpectrumUsingSupposedlyFasterBinaryReader(int scanNum, out float[] mzValues, out float[] intensities)
-        {            
+        {
 
             Check.Require(Parameters != null, "Cannot get mass spectrum. Need to first set Parameters.");
             Check.Require(scanNum < GetNumMSScans(), "Cannot get mass spectrum. Requested scan num is greater than number of scans in dataset.");
@@ -192,8 +187,8 @@ namespace BrukerDataReader
             }
 
             // Trim off m/z values according to parameters
-            var indexOfLowMZ = getIndexForMZ(Parameters.MinMZfilter, lengthOfMZAndIntensityArray);
-            var indexOfHighMZ = getIndexForMZ(Parameters.MaxMZfilter, lengthOfMZAndIntensityArray);
+            var indexOfLowMZ = getIndexForMZ(Parameters.MinMZFilter, lengthOfMZAndIntensityArray);
+            var indexOfHighMZ = getIndexForMZ(Parameters.MaxMZFilter, lengthOfMZAndIntensityArray);
 
             mzValues = new float[indexOfHighMZ - indexOfLowMZ];
             intensities = new float[indexOfHighMZ - indexOfLowMZ];
@@ -210,7 +205,7 @@ namespace BrukerDataReader
 
         /// <summary>
         /// Gets the mass spectrum. Main difference with 'GetMassSpectrumUsingSupposedlyFasterBinaryReader' is that a new BinaryReader is created
-        /// everytime here. This is advantageous in terms of making sure the file is opened and closed properly.
+        /// every time here. This is advantageous in terms of making sure the file is opened and closed properly.
         /// Unit tests show this to be about 3 to 10% slower. Presently (Nov 2010), since there isn't much speed gain, I favor this one.
         /// </summary>
         /// <param name="scanNum">Zero-based scan number</param>
@@ -220,7 +215,7 @@ namespace BrukerDataReader
         {
             var scanNums = new[] { scanNum };
 
-            GetMassSpectrum(scanNums, out mzValues, out intensities);         
+            GetMassSpectrum(scanNums, out mzValues, out intensities);
         }
 
 
@@ -232,8 +227,8 @@ namespace BrukerDataReader
             if (Parameters == null)
                 throw new Exception("Parameters is null in GetMassSpectrum");
 
-            Parameters.MinMZfilter = minMZ;
-            Parameters.MaxMZfilter = maxMZ;
+            Parameters.MinMZFilter = minMZ;
+            Parameters.MaxMZFilter = maxMZ;
 
             GetMassSpectrum(scanNum, out mzValues, out intensities);
         }
@@ -253,7 +248,7 @@ namespace BrukerDataReader
 
             validateScanNums(scanNumsToBeSummed);
             //Check.Require(scanNum < GetNumMSScans(), "Cannot get mass spectrum. Requested scan num is greater than number of scans in dataset.");
-      
+
             var scanDataList = new List<double[]>();
 
             using (var reader = new BinaryReader(File.Open(_fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
@@ -309,8 +304,8 @@ namespace BrukerDataReader
             }
 
             // Trim off m/z values according to parameters
-            var indexOfLowMZ = getIndexForMZ(Parameters.MinMZfilter, lengthOfMZAndIntensityArray);
-            var indexOfHighMZ = getIndexForMZ(Parameters.MaxMZfilter, lengthOfMZAndIntensityArray);
+            var indexOfLowMZ = getIndexForMZ(Parameters.MinMZFilter, lengthOfMZAndIntensityArray);
+            var indexOfHighMZ = getIndexForMZ(Parameters.MaxMZFilter, lengthOfMZAndIntensityArray);
 
             mzValues = new float[indexOfHighMZ - indexOfLowMZ];
             intensities = new float[indexOfHighMZ - indexOfLowMZ];
@@ -323,13 +318,13 @@ namespace BrukerDataReader
 
         }
 
-
+        // ReSharper disable once UnusedMember.Global
         public void GetMassSpectrum(int[] scansNumsToBeSummed, float minMZ, float maxMZ, out float[] mzValues, out float[] intensities)
         {
             Check.Require(maxMZ >= minMZ, "Cannot get mass spectrum. MinMZ is greater than MaxMZ - that's impossible.");
 
-            Parameters.MinMZfilter = minMZ;
-            Parameters.MaxMZfilter = maxMZ;
+            Parameters.MinMZFilter = minMZ;
+            Parameters.MaxMZFilter = maxMZ;
 
             GetMassSpectrum(scansNumsToBeSummed, out mzValues, out intensities);
 
@@ -340,7 +335,7 @@ namespace BrukerDataReader
         {
             foreach (var scanNum in scanNumsToBeSummed)
             {
-                Check.Require(scanNum < GetNumMSScans(),"Cannot get mass spectrum. Requested scan num (" + scanNum + ") is greater than number of scans in dataset. Note that the first scan is scan 0");                
+                Check.Require(scanNum < GetNumMSScans(),"Cannot get mass spectrum. Requested scan num (" + scanNum + ") is greater than number of scans in dataset. Note that the first scan is scan 0");
             }
         }
 
@@ -358,12 +353,12 @@ namespace BrukerDataReader
             {
                 return 0;
             }
-            
+
             if (index > arrayLength - 1)
             {
                 return arrayLength - 1;
             }
-            
+
             return index;
         }
 
@@ -387,15 +382,7 @@ namespace BrukerDataReader
             return mass;
         }
 
-        internal Int64 GetLengthOfDataFileInBytes()
-        {
-            return _lengthOfDataFileInBytes;
-        }
-
-
         #endregion
-
-
 
         #region IDisposable Members
 
