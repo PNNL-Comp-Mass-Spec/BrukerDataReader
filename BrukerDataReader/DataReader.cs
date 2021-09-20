@@ -108,7 +108,7 @@ namespace BrukerDataReader
             using (var reader = new BinaryReader(File.Open(FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
             {
                 var fileLength = reader.BaseStream.Length;
-                var totalNumberOfValues = fileLength / sizeof(Int32);
+                var totalNumberOfValues = fileLength / sizeof(int);
 
                 if (Parameters != null) _numMSScans = (int)(totalNumberOfValues / Parameters.NumValuesInScan);
             }
@@ -139,7 +139,7 @@ namespace BrukerDataReader
             var vals = new double[Parameters.NumValuesInScan];
             var diffBetweenCurrentAndPreviousScan = scanNum - _lastScanOpened;
 
-            var byteOffset = diffBetweenCurrentAndPreviousScan * (Int64)Parameters.NumValuesInScan * sizeof(Int32) - _bytesAdvanced;
+            var byteOffset = diffBetweenCurrentAndPreviousScan * (long)Parameters.NumValuesInScan * sizeof(int) - _bytesAdvanced;
 
             if (byteOffset != 0)
             {
@@ -237,7 +237,7 @@ namespace BrukerDataReader
                 {
                     var vals = new double[Parameters.NumValuesInScan];
 
-                    var bytePosition = scanNum * (long)Parameters.NumValuesInScan * sizeof(Int32);
+                    var bytePosition = scanNum * (long)Parameters.NumValuesInScan * sizeof(int);
 
                     reader.BaseStream.Seek(bytePosition, SeekOrigin.Begin);
                     for (var i = 0; i < Parameters.NumValuesInScan; i++)
