@@ -20,8 +20,8 @@ namespace BrukerDataReader
 
         private string GetNameFromNode(XElement node)
         {
-            var elementNames = (from n in node.Elements() select n.Name.LocalName);
-            var attributeNames = (from n in node.Attributes() select n.Name.LocalName);
+            var elementNames = from n in node.Elements() select n.Name.LocalName;
+            var attributeNames = from n in node.Attributes() select n.Name.LocalName;
 
             var nameIsAnXMLElement = elementNames.Contains("name");
 
@@ -109,7 +109,7 @@ namespace BrukerDataReader
 
                 if (paramListElement != null)
                 {
-                    var paramNodes = (from node in paramListElement.Elements() select node);
+                    var paramNodes = from node in paramListElement.Elements() select node;
 
                     foreach (var node in paramNodes)
                     {

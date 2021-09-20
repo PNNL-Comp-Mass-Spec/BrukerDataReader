@@ -162,9 +162,9 @@ namespace BrukerDataReader
             for (var i = 0; i < lengthOfMZAndIntensityArray; i++)
             {
                 var mz = (float)getMZ(i);
-                var intensity = (float)(Math.Sqrt(vals[2 * i + 1] * vals[2 * i + 1] + vals[2 * i] * vals[2 * i]));
+                var intensity = (float)Math.Sqrt(vals[2 * i + 1] * vals[2 * i + 1] + vals[2 * i] * vals[2 * i]);
 
-                var indexForReverseInsertion = (lengthOfMZAndIntensityArray - i - 1);
+                var indexForReverseInsertion = lengthOfMZAndIntensityArray - i - 1;
                 mzValuesFullRange[indexForReverseInsertion] = mz;
                 intensitiesFullRange[indexForReverseInsertion] = intensity;
             }
@@ -262,16 +262,16 @@ namespace BrukerDataReader
 
                 for (var j = 0; j < lengthOfMZAndIntensityArray; j++)
                 {
-                    var indexForReverseInsertion = (lengthOfMZAndIntensityArray - j - 1);
+                    var indexForReverseInsertion = lengthOfMZAndIntensityArray - j - 1;
 
-                    var firstTimeThrough = (i == 0);
+                    var firstTimeThrough = i == 0;
                     if (firstTimeThrough)
                     {
                         var mz = (float)getMZ(j);
                         mzValuesFullRange[indexForReverseInsertion] = mz;
                     }
 
-                    var intensity = (float)(Math.Sqrt(vals[2 * j + 1] * vals[2 * j + 1] + vals[2 * j] * vals[2 * j]));
+                    var intensity = (float)Math.Sqrt(vals[2 * j + 1] * vals[2 * j + 1] + vals[2 * j] * vals[2 * j]);
                     intensitiesFullRange[indexForReverseInsertion] += intensity;    //sum the intensities
                 }
             }
@@ -311,7 +311,7 @@ namespace BrukerDataReader
 
         private int getIndexForMZ(float targetMZ, int arrayLength)
         {
-            var index = (int)((Parameters.NumValuesInScan / Parameters.SampleRate) * (Parameters.ML1 / targetMZ - Parameters.ML2));
+            var index = (int)(Parameters.NumValuesInScan / Parameters.SampleRate * (Parameters.ML1 / targetMZ - Parameters.ML2));
             index = arrayLength - index;
 
             if (index < 0)
