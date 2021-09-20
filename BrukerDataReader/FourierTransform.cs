@@ -6,12 +6,22 @@ namespace BrukerDataReader
     {
         public int RealFourierTransform(ref double[] data)
         {
-            var isign = 1;
+            // int iSign = 1;
             var n = data.Length;
 
             int i, i1, i2, i3, i4, n2p3;
             double c1 = 0.5, c2, hir, h1i, h2r, h2i;
             double wpr, wpi, wi, wr, theta, wtemp;
+            //if (iSign == 1)
+            //{
+            const double c2 = -0.5f;
+            PerformFourierTransform(n, ref data, 1);
+            //}
+            //else
+            //{
+            //    c2 = 0.5f;
+            //    theta = -theta;
+            //}
 
             n = n / 2;
             theta = 3.141592653589793 / (double)n;
@@ -54,6 +64,14 @@ namespace BrukerDataReader
             else
             {
             }
+
+            //if (iSign == 1)
+            //{
+            data[0] = (hir = data[0]) + data[1];
+            data[1] = hir - data[1];
+            //		for(i=0;i<(n*2);i++) data[i] /= (n);  // GAA 50-30-00
+            //}
+
             return 0;
         }
 
