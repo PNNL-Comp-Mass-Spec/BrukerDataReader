@@ -15,7 +15,7 @@ namespace BrukerDataReader.UnitTests
         /// I need this test to make sure I'm moving the byte pointer properly.
         /// </summary>
         [Test]
-        public void sameScanGivesSameValuesOverAndOver_Test1()
+        public void SameScanGivesSameValuesOverAndOver_Test1()
         {
             var reader = new DataReader(FileRefs.Bruker_9T_ser_File1)
             {
@@ -61,7 +61,7 @@ namespace BrukerDataReader.UnitTests
         }
 
         [Test]
-        public void consecutiveScans_Test1()
+        public void ConsecutiveScans_Test1()
         {
             var reader = new DataReader(FileRefs.Bruker_9T_ser_File1)
             {
@@ -99,7 +99,7 @@ namespace BrukerDataReader.UnitTests
         }
 
         [Test]
-        public void consecutiveScans_SlowButSureTest1() // I find this to be about 3 to 10% slower than using a relative byte pointer
+        public void ConsecutiveScans_SlowButSureTest1() // I find this to be about 3 to 10% slower than using a relative byte pointer
         {
             var reader = new DataReader(FileRefs.Bruker_9T_ser_File1)
             {
@@ -137,7 +137,7 @@ namespace BrukerDataReader.UnitTests
         }
 
         [Test]
-        public void sumAcrossThreeScansTest1()
+        public void SumAcrossThreeScansTest1()
         {
             var reader = new DataReader(FileRefs.Bruker_9T_ser_File1)
             {
@@ -178,7 +178,7 @@ namespace BrukerDataReader.UnitTests
         }
 
         [Test]
-        public void consecutiveScans_smallMZRangeTest1()     // result:  smaller m/z range doesn't make it quicker.
+        public void ConsecutiveScans_smallMZRangeTest1()     // result:  smaller m/z range doesn't make it quicker.
         {
             var reader = new DataReader(FileRefs.Bruker_9T_ser_File1)
             {

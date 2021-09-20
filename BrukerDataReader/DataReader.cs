@@ -161,7 +161,7 @@ namespace BrukerDataReader
 
             for (var i = 0; i < lengthOfMZAndIntensityArray; i++)
             {
-                var mz = (float)getMZ(i);
+                var mz = (float)GetMZ(i);
                 var intensity = (float)Math.Sqrt(vals[2 * i + 1] * vals[2 * i + 1] + vals[2 * i] * vals[2 * i]);
 
                 var indexForReverseInsertion = lengthOfMZAndIntensityArray - i - 1;
@@ -170,8 +170,8 @@ namespace BrukerDataReader
             }
 
             // Trim off m/z values according to parameters
-            var indexOfLowMZ = getIndexForMZ(Parameters.MinMZFilter, lengthOfMZAndIntensityArray);
-            var indexOfHighMZ = getIndexForMZ(Parameters.MaxMZFilter, lengthOfMZAndIntensityArray);
+            var indexOfLowMZ = GetIndexForMZ(Parameters.MinMZFilter, lengthOfMZAndIntensityArray);
+            var indexOfHighMZ = GetIndexForMZ(Parameters.MaxMZFilter, lengthOfMZAndIntensityArray);
 
             mzValues = new float[indexOfHighMZ - indexOfLowMZ];
             intensities = new float[indexOfHighMZ - indexOfLowMZ];
@@ -226,7 +226,7 @@ namespace BrukerDataReader
             if (Parameters == null)
                 throw new Exception("Parameters is null in GetMassSpectrum");
 
-            validateScanNums(scanNumsToBeSummed);
+            ValidateScanNums(scanNumsToBeSummed);
             //Check.Require(scanNum < GetNumMSScans(), "Cannot get mass spectrum. Requested scan number is greater than number of scans in dataset.");
 
             var scanDataList = new List<double[]>();
@@ -267,7 +267,7 @@ namespace BrukerDataReader
                     var firstTimeThrough = i == 0;
                     if (firstTimeThrough)
                     {
-                        var mz = (float)getMZ(j);
+                        var mz = (float)GetMZ(j);
                         mzValuesFullRange[indexForReverseInsertion] = mz;
                     }
 
@@ -277,8 +277,8 @@ namespace BrukerDataReader
             }
 
             // Trim off m/z values according to parameters
-            var indexOfLowMZ = getIndexForMZ(Parameters.MinMZFilter, lengthOfMZAndIntensityArray);
-            var indexOfHighMZ = getIndexForMZ(Parameters.MaxMZFilter, lengthOfMZAndIntensityArray);
+            var indexOfLowMZ = GetIndexForMZ(Parameters.MinMZFilter, lengthOfMZAndIntensityArray);
+            var indexOfHighMZ = GetIndexForMZ(Parameters.MaxMZFilter, lengthOfMZAndIntensityArray);
 
             mzValues = new float[indexOfHighMZ - indexOfLowMZ];
             intensities = new float[indexOfHighMZ - indexOfLowMZ];
@@ -301,7 +301,7 @@ namespace BrukerDataReader
             GetMassSpectrum(scansNumsToBeSummed, out mzValues, out intensities);
         }
 
-        private void validateScanNums(IEnumerable<int> scanNumsToBeSummed)
+        private void ValidateScanNums(IEnumerable<int> scanNumsToBeSummed)
         {
             foreach (var scanNum in scanNumsToBeSummed)
             {
@@ -309,7 +309,7 @@ namespace BrukerDataReader
             }
         }
 
-        private int getIndexForMZ(float targetMZ, int arrayLength)
+        private int GetIndexForMZ(float targetMZ, int arrayLength)
         {
             var index = (int)(Parameters.NumValuesInScan / Parameters.SampleRate * (Parameters.ML1 / targetMZ - Parameters.ML2));
             index = arrayLength - index;
@@ -327,7 +327,7 @@ namespace BrukerDataReader
             return index;
         }
 
-        private double getMZ(int i)
+        private double GetMZ(int i)
         {
             var freq = i * Parameters.SampleRate / Parameters.NumValuesInScan;
 
