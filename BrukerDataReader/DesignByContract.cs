@@ -4,6 +4,7 @@ using System.Diagnostics;
 // ReSharper disable UnusedMember.Global
 namespace BrukerDataReader
 {
+    [AttributeUsage(AttributeTargets.All)]
     public class CoverageExcludeAttribute : Attribute { }
 
     [CoverageExcludeAttribute]
