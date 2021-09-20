@@ -199,6 +199,8 @@ namespace BrukerDataReader.UnitTests
             var serFile = new FileInfo(FileRefs.Bruker15TFile1);
             var directory = serFile.Directory;
 
+            if (directory == null)
+                Assert.Fail("Unable to determine the parent directory of " + serFile.FullName);
 
             var settingsFilePath = Path.Combine(directory.FullName, "ESI_pos_150_3000.m", "apexAcquisition.method");
             if (!File.Exists(settingsFilePath))
@@ -220,6 +222,9 @@ namespace BrukerDataReader.UnitTests
             var serFile = new FileInfo(FileRefs.Bruker_12T_ser_File1);
             var directory = serFile.Directory;
 
+            if (directory == null)
+                Assert.Fail("Unable to determine the parent directory of " + serFile.FullName);
+
             var settingsFilePath = Path.Combine(directory.FullName, "ACQUS");
             if (!File.Exists(settingsFilePath))
                 throw new FileNotFoundException("Settings file not found at " + settingsFilePath);
@@ -238,6 +243,8 @@ namespace BrukerDataReader.UnitTests
             var serFile = new FileInfo(FileRefs.Bruker_9T_ser_File1);
             var directory = serFile.Directory;
 
+            if (directory == null)
+                Assert.Fail("Unable to determine the parent directory of " + serFile.FullName);
 
             var settingsFilePath = Path.Combine(directory.FullName, "acqus");
             if (!File.Exists(settingsFilePath))
