@@ -2,6 +2,8 @@
 {
     public static class FileRefs
     {
+        // Ignore Spelling: fid, ser
+
         public static string Bruker_12T_FID_File1 = @"\\proto-2\unitTest_Files\BrukerDataReader\Bruker_Solarix12T\HVY_MSCAL_000001\HVY_MSCAL_000001.D\fid";
 
         public static string Bruker_12T_ser_File1 = @"\\proto-2\unitTest_Files\BrukerDataReader\Bruker_Solarix12T\28JUN10_TNT_500nM_000002\ser";

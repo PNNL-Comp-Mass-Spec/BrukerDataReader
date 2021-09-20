@@ -10,6 +10,9 @@ namespace BrukerDataReader
     class BrukerSettingsFileReader
     {
         struct BrukerNameValuePair
+        // ReSharper disable once CommentTypo
+        // Ignore Spelling: Bruker, paramlist, pre
+
         {
             public string Name;
             public string Value;

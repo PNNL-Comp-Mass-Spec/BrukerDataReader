@@ -8,6 +8,8 @@ namespace BrukerDataReader.UnitTests
     [TestFixture]
     public class DataReaderTests
     {
+        // Ignore Spelling: acqus
+
         [Test]
         public void GetNumMSScans_Test1()
         {

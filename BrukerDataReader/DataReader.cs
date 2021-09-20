@@ -9,6 +9,7 @@ namespace BrukerDataReader
 
     public class DataReader : IDisposable
     {
+        // Ignore Spelling: acqu, acqus, apodization, Bruker, fid, ser
 
         readonly string _fileName;
         int _numMSScans = -1;
