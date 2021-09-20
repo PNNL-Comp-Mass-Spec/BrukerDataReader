@@ -351,9 +351,9 @@ namespace BrukerDataReader.UnitTests
             {
                 reader.GetMassSpectrum(testScan, minMZ, maxMz, out var mzVals, out var intensities);
             }
-            catch (BrukerDataReader.PreconditionException ex)
+            catch (PreconditionException ex)
             {
-                Assert.That(ex.Message, Is.StringStarting("Cannot get mass spectrum. Requested scan num (5000) is greater than number of scans in dataset."));
+                Assert.That(ex.Message, Is.StringStarting("Cannot get mass spectrum. Requested scan number (5000) is greater than number of scans in dataset."));
                 return;
             }
             catch (Exception ex)
@@ -384,7 +384,7 @@ namespace BrukerDataReader.UnitTests
             var testScan = 5000;
 
             var ex = Assert.Throws<BrukerDataReader.PreconditionException>(() => reader.GetMassSpectrum(testScan, out mzVals, out intensities));
-            Assert.That(ex.Message, Is.StringStarting("Cannot get mass spectrum. Requested scan num (5000) is greater than number of scans in dataset."));
+            Assert.That(ex.Message, Is.StringStarting("Cannot get mass spectrum. Requested scan number (5000) is greater than number of scans in dataset."));
         }
         [Test]
         public void ExceptionTest_parametersNotSet_Test1()

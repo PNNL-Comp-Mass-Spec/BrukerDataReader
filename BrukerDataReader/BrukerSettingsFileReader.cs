@@ -85,7 +85,7 @@ namespace BrukerDataReader
 
         public GlobalParameters LoadApexAcqParameters(FileInfo fiSettingsFile)
         {
-            // Bruker's acquisition software will write out data like this to the apexAcquisition.method file
+            // Bruker acquisition software will write out data like this to the apexAcquisition.method file
             // if the user enters a sample description of "<2mg/mL  100mM  AA  SID35"
             //
             //   <sampledescription>&lt;<2mg/mL&#x20; 100mM&#x20; AA&#x20; SID35</sampledescription>
@@ -129,7 +129,7 @@ namespace BrukerDataReader
             {
                 ML1 = GetDoubleFromParamList(paramList, "ML1", 0),                  // calA
                 ML2 = GetDoubleFromParamList(paramList, "ML2", 0),                  // calB
-                SampleRate = GetDoubleFromParamList(paramList, "SW_h", 0) * 2,       // sampleRate; SW_h is the digitizer rate and Bruker entered it as the nyquist frequency so it needs to be multiplied by 2.
+                SampleRate = GetDoubleFromParamList(paramList, "SW_h", 0) * 2,       // sampleRate; SW_h is the digitizer rate and Bruker entered it as the Nyquist frequency so it needs to be multiplied by 2.
                 NumValuesInScan = Convert.ToInt32(GetDoubleFromParamList(paramList, "TD", 0)),   // numValuesInScan
                 AcquiredMZMinimum = GetDoubleFromParamList(paramList, "EXC_low", 0),         // Minimum m/z value in each mass spectrum
                 AcquiredMZMaximum = GetDoubleFromParamList(paramList, "EXC_hi", 0)           // Maximum m/z value in each mass spectrum
@@ -151,7 +151,7 @@ namespace BrukerDataReader
             }
             catch (Exception)
             {
-                // Ignore exceptions
+                // Ignore errors here
             }
 
             return parameters;
@@ -231,7 +231,7 @@ namespace BrukerDataReader
             {
                 ML1 = dataLookupTable["ML1"],
                 ML2 = dataLookupTable["ML2"],
-                // From Gordon A.:  SW_h is the digitizer rate and Bruker entered it as the nyquist frequency so it needs to be multiplied by 2.
+                // From Gordon A.:  SW_h is the digitizer rate and Bruker entered it as the Nyquist frequency so it needs to be multiplied by 2.
                 SampleRate = dataLookupTable["SW_h"] * 2,
                 NumValuesInScan = (int)dataLookupTable["TD"]
             };

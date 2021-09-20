@@ -4,8 +4,8 @@ using System.IO;
 
 namespace BrukerDataReader
 {
-    //TODO:  add apodization ability
-    //TODO:  remove all dependence on DeconEngine (FFT, apodization, etc).
+    // TODO: add apodization ability
+    // TODO: remove all dependence on DeconEngine (FFT, apodization, etc).
 
     public class DataReader : IDisposable
     {
@@ -126,7 +126,7 @@ namespace BrukerDataReader
         public void GetMassSpectrumUsingSupposedlyFasterBinaryReader(int scanNum, out float[] mzValues, out float[] intensities)
         {
             Check.Require(Parameters != null, "Cannot get mass spectrum. Need to first set Parameters.");
-            Check.Require(scanNum < GetNumMSScans(), "Cannot get mass spectrum. Requested scan num is greater than number of scans in dataset.");
+            Check.Require(scanNum < GetNumMSScans(), "Cannot get mass spectrum. Requested scan number is greater than number of scans in dataset.");
 
             if (_reader == null)
             {
@@ -227,7 +227,7 @@ namespace BrukerDataReader
                 throw new Exception("Parameters is null in GetMassSpectrum");
 
             validateScanNums(scanNumsToBeSummed);
-            //Check.Require(scanNum < GetNumMSScans(), "Cannot get mass spectrum. Requested scan num is greater than number of scans in dataset.");
+            //Check.Require(scanNum < GetNumMSScans(), "Cannot get mass spectrum. Requested scan number is greater than number of scans in dataset.");
 
             var scanDataList = new List<double[]>();
 
@@ -305,7 +305,7 @@ namespace BrukerDataReader
         {
             foreach (var scanNum in scanNumsToBeSummed)
             {
-                Check.Require(scanNum < GetNumMSScans(),"Cannot get mass spectrum. Requested scan num (" + scanNum + ") is greater than number of scans in dataset. Note that the first scan is scan 0");
+                Check.Require(scanNum < GetNumMSScans(),"Cannot get mass spectrum. Requested scan number (" + scanNum + ") is greater than number of scans in dataset. Note that the first scan is scan 0");
             }
         }
 
