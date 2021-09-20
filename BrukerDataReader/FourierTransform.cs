@@ -4,8 +4,6 @@ namespace BrukerDataReader
 {
     public class FourierTransform
     {
-
-
         public int RealFourierTransform(ref double[] data)
         {
             var isign = 1;
@@ -55,12 +53,9 @@ namespace BrukerDataReader
             }
             else
             {
-
             }
             return 0;
         }
-
-
 
         private void PerformFourierTransform(int nn, ref double[] data, int isign)
         {

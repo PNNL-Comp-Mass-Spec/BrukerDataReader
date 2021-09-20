@@ -1,12 +1,9 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 
 namespace BrukerDataReader
 {
-
-
     //TODO:  add apodization ability
     //TODO:  remove all dependence on DeconEngine (FFT, apodization, etc).
 
@@ -30,7 +27,6 @@ namespace BrukerDataReader
         /// <param name="settingsFilePath">Path to the acqus or apexAcquisition.method file that should be used for reading parameters</param>
         public DataReader(string fileName, string settingsFilePath = "")
         {
-
             if (File.Exists(fileName))
             {
                 _fileName = fileName;
@@ -53,9 +49,7 @@ namespace BrukerDataReader
             {
                 LoadParameters(settingsFilePath);
             }
-
         }
-
 
         #region Properties
 
@@ -93,9 +87,7 @@ namespace BrukerDataReader
                 default:
                     throw new Exception("Unrecognized settings file (" + fiSettingsFile.Name + "); should be acqus or apexAcquisition.method");
             }
-
         }
-
 
         public void SetParameters(double calA, double calB, double sampleRate, int numValuesInScan)
         {
@@ -109,7 +101,6 @@ namespace BrukerDataReader
 
         public int GetNumMSScans()
         {
-
             // If numMSScans was already stored, then return it
             if (_numMSScans != -1)
             {
@@ -140,7 +131,6 @@ namespace BrukerDataReader
         // ReSharper disable once UnusedMember.Global
         public void GetMassSpectrumUsingSupposedlyFasterBinaryReader(int scanNum, out float[] mzValues, out float[] intensities)
         {
-
             Check.Require(Parameters != null, "Cannot get mass spectrum. Need to first set Parameters.");
             Check.Require(scanNum < GetNumMSScans(), "Cannot get mass spectrum. Requested scan num is greater than number of scans in dataset.");
 
@@ -160,7 +150,6 @@ namespace BrukerDataReader
             if (byteOffset != 0)
             {
                 _reader.BaseStream.Seek(byteOffset, SeekOrigin.Current);
-
             }
 
             _previousStartPosition = _reader.BaseStream.Position;
@@ -200,7 +189,6 @@ namespace BrukerDataReader
             }
 
             _lastScanOpened = scanNum;
-
         }
 
         /// <summary>
@@ -218,7 +206,6 @@ namespace BrukerDataReader
             GetMassSpectrum(scanNums, out mzValues, out intensities);
         }
 
-
         public void GetMassSpectrum(int scanNum, float minMZ, float maxMZ, out float[] mzValues, out float[] intensities)
         {
             Check.Require(Parameters != null && Parameters.ML1 > -1, "Cannot get mass spectrum. Need to first set Parameters.");
@@ -232,7 +219,6 @@ namespace BrukerDataReader
 
             GetMassSpectrum(scanNum, out mzValues, out intensities);
         }
-
 
         /// <summary>
         /// Gets the summed mass spectrum.
@@ -253,7 +239,6 @@ namespace BrukerDataReader
 
             using (var reader = new BinaryReader(File.Open(_fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
             {
-
                 foreach (var scanNum in scanNumsToBeSummed)
                 {
                     var vals = new double[Parameters.NumValuesInScan];
@@ -267,18 +252,14 @@ namespace BrukerDataReader
                     }
 
                     scanDataList.Add(vals);
-
                 }
 
                 reader.Close();
-
             }
-
 
             var lengthOfMZAndIntensityArray = Parameters.NumValuesInScan / 2;
             var mzValuesFullRange = new float[lengthOfMZAndIntensityArray];
             var intensitiesFullRange = new float[lengthOfMZAndIntensityArray];
-
 
             for (var i = 0; i < scanDataList.Count; i++)
             {
@@ -287,7 +268,6 @@ namespace BrukerDataReader
 
                 for (var j = 0; j < lengthOfMZAndIntensityArray; j++)
                 {
-
                     var indexForReverseInsertion = (lengthOfMZAndIntensityArray - j - 1);
 
                     var firstTimeThrough = (i == 0);
@@ -300,7 +280,6 @@ namespace BrukerDataReader
                     var intensity = (float)(Math.Sqrt(vals[2 * j + 1] * vals[2 * j + 1] + vals[2 * j] * vals[2 * j]));
                     intensitiesFullRange[indexForReverseInsertion] += intensity;    //sum the intensities
                 }
-
             }
 
             // Trim off m/z values according to parameters
@@ -315,7 +294,6 @@ namespace BrukerDataReader
                 mzValues[i - indexOfLowMZ] = mzValuesFullRange[i];
                 intensities[i - indexOfLowMZ] = intensitiesFullRange[i];
             }
-
         }
 
         // ReSharper disable once UnusedMember.Global
@@ -327,9 +305,7 @@ namespace BrukerDataReader
             Parameters.MaxMZFilter = maxMZ;
 
             GetMassSpectrum(scansNumsToBeSummed, out mzValues, out intensities);
-
         }
-
 
         private void validateScanNums(IEnumerable<int> scanNumsToBeSummed)
         {
@@ -338,7 +314,6 @@ namespace BrukerDataReader
                 Check.Require(scanNum < GetNumMSScans(),"Cannot get mass spectrum. Requested scan num (" + scanNum + ") is greater than number of scans in dataset. Note that the first scan is scan 0");
             }
         }
-
 
         #endregion
 
@@ -390,7 +365,6 @@ namespace BrukerDataReader
         {
             try
             {
-
                 if (_reader != null)
                 {
                     using (var br = _reader)
@@ -398,14 +372,11 @@ namespace BrukerDataReader
                         br.Close();
                     }
                 }
-
             }
             catch (Exception)
             {
-
                 Console.WriteLine("BrukerDataReader had problems closing the binary reader. Note this.");
             }
-
         }
 
         #endregion

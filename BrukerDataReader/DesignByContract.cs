@@ -4,7 +4,6 @@ using System.Diagnostics;
 // ReSharper disable UnusedMember.Global
 namespace BrukerDataReader
 {
-
     public class CoverageExcludeAttribute : Attribute { }
 
     [CoverageExcludeAttribute]
@@ -20,7 +19,6 @@ namespace BrukerDataReader
             if (UseExceptions)
             {
                 if (!assertion) throw new PreconditionException(message);
-
             }
             else
             {

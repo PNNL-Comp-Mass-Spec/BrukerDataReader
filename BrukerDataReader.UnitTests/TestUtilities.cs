@@ -5,8 +5,6 @@ namespace BrukerDataReader.UnitTests
 {
     public class TestUtilities
     {
-
-
         public static void DisplayXYValues(
             float[] xValues,
             float[] yValues,
@@ -32,8 +30,5 @@ namespace BrukerDataReader.UnitTests
             }
             Console.Write(sb.ToString());
         }
-
-
-
     }
 }

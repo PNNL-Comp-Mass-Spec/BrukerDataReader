@@ -8,7 +8,6 @@ namespace BrukerDataReader.UnitTests
     [TestFixture]
     public class DataReaderTests
     {
-
         [Test]
         public void GetNumMSScans_Test1()
         {
@@ -57,12 +56,6 @@ namespace BrukerDataReader.UnitTests
             TestUtilities.DisplayXYValues(mzVals, intensities);
         }
 
-
-
-
-
-
-
         [Test]
         public void GetMassSpectrum_Bruker9T_Test1()
         {
@@ -90,10 +83,7 @@ namespace BrukerDataReader.UnitTests
             Console.WriteLine("Time= " + sw.ElapsedMilliseconds);
 
             reader.GetMassSpectrum(testScan, out mzVals, out intensities);
-
-
         }
-
 
         [Test]
         public void Get_Summed_MassSpectrum_Bruker9T_Test1()
@@ -112,7 +102,6 @@ namespace BrukerDataReader.UnitTests
             Assert.AreEqual(4275, reader.GetNumMSScans());
             Assert.AreEqual(FileRefs.Bruker_9T_ser_File1, reader.FileName);
 
-
             var testScan = 1000;
             reader.GetMassSpectrum(testScan, out var mzVals, out var intensities);
 
@@ -127,15 +116,9 @@ namespace BrukerDataReader.UnitTests
             Assert.AreEqual(713.6588m, (decimal)mzValsSummed[testPoint]);
             Assert.AreEqual(16332480m, (decimal)intensitiesSummed[testPoint]);
 
-
-
-
             //713.658752441406	4970525.5
 
         }
-
-
-
 
         [Test]
         public void GetMassSpectrum_Bruker15T_Test1()
@@ -153,7 +136,6 @@ namespace BrukerDataReader.UnitTests
 
             Assert.AreEqual(18, reader.GetNumMSScans());
 
-
             var testScan = 4;
             reader.GetMassSpectrum(testScan, out var mzVals, out var intensities);
             Assert.AreEqual(789.9679m, (decimal)mzVals[129658]);
@@ -161,7 +143,6 @@ namespace BrukerDataReader.UnitTests
             TestUtilities.DisplayXYValues(mzVals, intensities, 0, 714, 717);
 
             TestUtilities.DisplayXYValues(mzVals, intensities, 0, 857, 858);
-
         }
 
         [Test]
@@ -180,18 +161,15 @@ namespace BrukerDataReader.UnitTests
 
             Assert.AreEqual(21, reader.GetNumMSScans());
 
-
             var testScan = 10;
             reader.GetMassSpectrum(testScan, out var mzVals, out var intensities);
             Assert.AreEqual(375.6136m, (decimal)mzVals[129658]);
 
             TestUtilities.DisplayXYValues(mzVals, intensities, 0, 428, 429);
-
         }
         [Test]
         public void GetMassSpectrum_Bruker15T_Test3()
         {
-
             var reader = new DataReader(FileRefs.Bruker15T_FID_File1)
             {
                 // The parameters come from file apexAcquisition.method
@@ -206,14 +184,11 @@ namespace BrukerDataReader.UnitTests
 
             Assert.AreEqual(1, reader.GetNumMSScans());
 
-
             var testScan = 0;
             reader.GetMassSpectrum(testScan, out var mzVals, out var intensities);
             Assert.AreEqual(1580.17m, (decimal)mzVals[129658]);
 
             TestUtilities.DisplayXYValues(mzVals, intensities, 0, 850, 865);
-
-
         }
 
         [Test]
@@ -234,7 +209,6 @@ namespace BrukerDataReader.UnitTests
             Assert.AreEqual((float)(576923.0769230769 * 2), (float)reader.Parameters.SampleRate);
             Assert.AreEqual((float)399.2, (float)reader.Parameters.AcquiredMZMinimum);
             Assert.AreEqual((float)3000, (float)reader.Parameters.AcquiredMZMaximum);
-
         }
 
         [Test]
@@ -253,7 +227,6 @@ namespace BrukerDataReader.UnitTests
             Assert.AreEqual((float)10.0177657215039, (float)reader.Parameters.ML2);
             Assert.AreEqual(1048576, reader.Parameters.NumValuesInScan);
             Assert.AreEqual((float)(434782.60869565216 * 2), (float)reader.Parameters.SampleRate);
-
         }
 
         [Test]
@@ -275,7 +248,6 @@ namespace BrukerDataReader.UnitTests
 
             Assert.AreEqual((float)389.79956, (float)reader.Parameters.AcquiredMZMinimum);
             Assert.AreEqual((float)2500, (float)reader.Parameters.AcquiredMZMaximum);
-
         }
 
         [Test]
@@ -292,7 +264,6 @@ namespace BrukerDataReader.UnitTests
                 }
             };
 
-
             var testScan = 1000;
 
             var minMZ = 695.5f;
@@ -300,7 +271,6 @@ namespace BrukerDataReader.UnitTests
 
             reader.GetMassSpectrum(testScan, minMZ, maxMz, out var mzVals, out var intensities);
         }
-
 
         [Test]
         public void GetMassSpectrum_extremeMZRange_test1()
@@ -315,7 +285,6 @@ namespace BrukerDataReader.UnitTests
                     NumValuesInScan = 524288
                 }
             };
-
 
             var testScan = 1000;
 
@@ -371,7 +340,6 @@ namespace BrukerDataReader.UnitTests
                 }
             };
 
-
             var testScan = 5000;
 
             var minMZ = 695.5f;
@@ -392,7 +360,6 @@ namespace BrukerDataReader.UnitTests
             }
 
             throw new Exception("PreconditionException was not thrown due to the out-of-range scan number; test failed");
-
         }
 
         [Test]
@@ -409,7 +376,6 @@ namespace BrukerDataReader.UnitTests
                 }
             };
 
-
             float[] mzVals;
             float[] intensities;
 
@@ -417,7 +383,6 @@ namespace BrukerDataReader.UnitTests
 
             var ex = Assert.Throws<BrukerDataReader.PreconditionException>(() => reader.GetMassSpectrum(testScan, out mzVals, out intensities));
             Assert.That(ex.Message, Is.StringStarting("Cannot get mass spectrum. Requested scan num (5000) is greater than number of scans in dataset."));
-
         }
         [Test]
         public void ExceptionTest_parametersNotSet_Test1()
@@ -431,7 +396,6 @@ namespace BrukerDataReader.UnitTests
 
             var ex = Assert.Throws<BrukerDataReader.PreconditionException>(() => reader.GetMassSpectrum(testScan, out mzVals, out intensities));
             Assert.That(ex.Message, Is.EqualTo("Cannot get mass spectrum. Need to first set Parameters."));
-
         }
 
         [Test]
@@ -448,7 +412,6 @@ namespace BrukerDataReader.UnitTests
 
             var ex = Assert.Throws<BrukerDataReader.PreconditionException>(() => reader.GetMassSpectrum(testScan, minMZ, maxMz, out mzVals, out intensities));
             Assert.That(ex.Message, Is.EqualTo("Cannot get mass spectrum. Need to first set Parameters."));
-
         }
 
         [Test]
@@ -474,10 +437,6 @@ namespace BrukerDataReader.UnitTests
 
             var ex = Assert.Throws<BrukerDataReader.PreconditionException>(() => reader.GetMassSpectrum(testScan, minMZ, maxMz, out mzVals, out intensities));
             Assert.That(ex.Message, Is.EqualTo("Cannot get mass spectrum. MinMZ is greater than MaxMZ - that's impossible."));
-
         }
-
-
-
     }
 }

@@ -9,7 +9,6 @@ namespace BrukerDataReader
 {
     class BrukerSettingsFileReader
     {
-
         struct BrukerNameValuePair
         {
             public string Name;
@@ -63,7 +62,6 @@ namespace BrukerDataReader
                 {
                     valueString = element.Value;
                 }
-
             }
 
             return valueString;
@@ -154,7 +152,6 @@ namespace BrukerDataReader
             }
 
             return parameters;
-
         }
 
         private string PreScanApexAcqFile(string apexAcqFilePath)
@@ -190,9 +187,7 @@ namespace BrukerDataReader
                     {
                         writer.WriteLine(dataLine);
                     }
-
                 }
-
             }
 
             return fixedFilePath;
@@ -200,7 +195,6 @@ namespace BrukerDataReader
 
         public GlobalParameters LoadApexAcqusParameters(FileInfo fiSettingsFile)
         {
-
             var dataLookupTable = new Dictionary<string, double>();
 
             using (var sr = new StreamReader(fiSettingsFile.FullName))
@@ -228,7 +222,6 @@ namespace BrukerDataReader
 
                     dataLookupTable.Add(variableName, parsedResult);
                 }
-
             }
 
             var parameters = new GlobalParameters
@@ -248,6 +241,5 @@ namespace BrukerDataReader
 
             return parameters;
         }
-
     }
 }

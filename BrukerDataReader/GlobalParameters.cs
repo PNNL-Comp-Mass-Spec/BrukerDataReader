@@ -3,7 +3,6 @@ using System.Text;
 
 namespace BrukerDataReader
 {
-
     public class GlobalParameters
     {
         /// <summary>
@@ -90,6 +89,5 @@ namespace BrukerDataReader
             MinMZFilter = 300;
             MaxMZFilter = 2000;
         }
-
     }
 }

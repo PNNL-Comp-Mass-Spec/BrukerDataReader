@@ -13,7 +13,5 @@
         public static string Bruker15TFile2 = @"\\proto-2\unitTest_Files\BrukerDataReader\Bruker_15T\2014_08_21_Beam_Valve_Closing_LCmode_Neg_15T_000001\2014_08_21_Beam_Valve_Closing_LCmode_Neg_15T_000001.d\ser";
 
         public static string Bruker15T_FID_File1 = @"\\proto-2\unitTest_Files\BrukerDataReader\Bruker_15T\2014_09_29_MnX_000002\2014_09_29_MnX_000002.d\fid";
-
-
     }
 }

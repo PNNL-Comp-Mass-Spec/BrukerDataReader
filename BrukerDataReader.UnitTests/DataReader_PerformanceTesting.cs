@@ -40,14 +40,12 @@ namespace BrukerDataReader.UnitTests
             var testXVal = mzVals[testIndex];
             var testYVal = intensities[testIndex];
 
-
             var sw = new Stopwatch();
             for (var i = 0; i < 20; i++)
             {
                 sw.Start();
 
                 Console.Write("scan= " + scanNum);
-
 
                 reader.GetMassSpectrum(scanNum, out mzVals, out intensities);
                 sw.Stop();
@@ -57,13 +55,9 @@ namespace BrukerDataReader.UnitTests
 
                 Assert.AreEqual(testXVal, mzVals[testIndex]);
                 Assert.AreEqual(testYVal, intensities[testIndex]);
-
             }
 
             Console.WriteLine("Average time = " + timeList.Average());
-
-
-
         }
 
         [Test]
@@ -99,15 +93,9 @@ namespace BrukerDataReader.UnitTests
                 Console.WriteLine("; time= " + sw.ElapsedMilliseconds);
                 timeList.Add(sw.ElapsedMilliseconds);
                 sw.Reset();
-
-
-
             }
 
             Console.WriteLine("Average time = " + timeList.Average());
-
-
-
         }
 
         [Test]
@@ -146,9 +134,6 @@ namespace BrukerDataReader.UnitTests
             }
 
             Console.WriteLine("Average time = " + timeList.Average());
-
-
-
         }
 
         [Test]
@@ -187,17 +172,10 @@ namespace BrukerDataReader.UnitTests
                 Console.WriteLine("; time= " + sw.ElapsedMilliseconds);
                 timeList.Add(sw.ElapsedMilliseconds);
                 sw.Reset();
-
-
-
             }
 
             Console.WriteLine("Average time = " + timeList.Average());
-
         }
-
-
-
 
         [Test]
         public void consecutiveScans_smallMZRangeTest1()     // result:  smaller m/z range doesn't make it quicker.
@@ -221,7 +199,6 @@ namespace BrukerDataReader.UnitTests
             var minMZ = 695.5f;
             var maxMZ = 696.9f;
 
-
             reader.GetMassSpectrum(scanNum, minMZ, maxMZ, out _, out _);
 
             var sw = new Stopwatch();
@@ -236,13 +213,9 @@ namespace BrukerDataReader.UnitTests
                 Console.WriteLine("; time= " + sw.ElapsedMilliseconds);
                 timeList.Add(sw.ElapsedMilliseconds);
                 sw.Reset();
-
-
-
             }
 
             Console.WriteLine("Average time = " + timeList.Average());
-
         }
     }
 }
