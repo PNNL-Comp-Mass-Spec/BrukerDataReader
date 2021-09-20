@@ -9,8 +9,6 @@ namespace BrukerDataReader
     [CoverageExcludeAttribute]
     public static class Check
     {
-        #region Interface
-
         /// <summary>
         /// Precondition check - should run regardless of preprocessor directives.
         /// </summary>
@@ -201,11 +199,6 @@ namespace BrukerDataReader
             get => useAssertions;
             set => useAssertions = value;
         }
-
-        #endregion // Interface
-
-        #region Implementation
-
         // No creation
 
         /// <summary>
@@ -218,11 +211,7 @@ namespace BrukerDataReader
         // ReSharper disable once RedundantDefaultMemberInitializer
         private static bool useAssertions = false;
 
-        #endregion // Implementation
-
     } // End Check
-
-    #region Exceptions
 
     /// <summary>
     /// Exception raised when a contract is broken.
@@ -322,6 +311,4 @@ namespace BrukerDataReader
         /// </summary>
         public AssertionException(string message, Exception inner) : base(message, inner) { }
     }
-
-    #endregion // Exception classes
 }

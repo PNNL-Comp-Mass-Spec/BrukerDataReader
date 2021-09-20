@@ -52,15 +52,9 @@ namespace BrukerDataReader
             }
         }
 
-        #region Properties
-
         public GlobalParameters Parameters { get; set; }
 
         public string FileName => _fileName;
-
-        #endregion
-
-        #region Public Methods
 
         /// <summary>
         /// Load the parameters from an acqus file or apexAcquisition.method file
@@ -316,10 +310,6 @@ namespace BrukerDataReader
             }
         }
 
-        #endregion
-
-        #region Private Methods
-
         private int getIndexForMZ(float targetMZ, int arrayLength)
         {
             var index = (int)((Parameters.NumValuesInScan / Parameters.SampleRate) * (Parameters.ML1 / targetMZ - Parameters.ML2));
@@ -358,9 +348,6 @@ namespace BrukerDataReader
             return mass;
         }
 
-        #endregion
-
-        #region IDisposable Members
 
         public void Dispose()
         {
@@ -379,7 +366,5 @@ namespace BrukerDataReader
                 Console.WriteLine("BrukerDataReader had problems closing the binary reader. Note this.");
             }
         }
-
-        #endregion
     }
 }
