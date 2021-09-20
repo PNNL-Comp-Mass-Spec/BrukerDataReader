@@ -29,7 +29,7 @@ namespace BrukerDataReader
         {
             if (File.Exists(fileName))
             {
-                _fileName = fileName;
+                FileName = fileName;
             }
             else
             {
@@ -37,7 +37,7 @@ namespace BrukerDataReader
             }
 
             // Assure that the file can be opened
-            using (new BinaryReader(File.Open(_fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
+            using (new BinaryReader(File.Open(FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
             {
             }
 
@@ -53,7 +53,7 @@ namespace BrukerDataReader
 
         public GlobalParameters Parameters { get; set; }
 
-        public string FileName => _fileName;
+        public string FileName { get; }
 
         /// <summary>
         /// Load the parameters from an acqus file or apexAcquisition.method file
@@ -105,7 +105,7 @@ namespace BrukerDataReader
 
             Check.Require(Parameters != null && Parameters.NumValuesInScan > 0, "Cannot determine number of MS Scans. Parameter for number of points in Scan has not been set.");
 
-            using (var reader = new BinaryReader(File.Open(_fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
+            using (var reader = new BinaryReader(File.Open(FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
             {
                 var fileLength = reader.BaseStream.Length;
                 var totalNumberOfValues = fileLength / sizeof(Int32);
@@ -130,7 +130,7 @@ namespace BrukerDataReader
 
             if (_reader == null)
             {
-                _reader = new BinaryReader(File.Open(_fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+                _reader = new BinaryReader(File.Open(FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
             }
 
             if (Parameters == null)
@@ -231,7 +231,7 @@ namespace BrukerDataReader
 
             var scanDataList = new List<double[]>();
 
-            using (var reader = new BinaryReader(File.Open(_fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
+            using (var reader = new BinaryReader(File.Open(FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
             {
                 foreach (var scanNum in scanNumsToBeSummed)
                 {

@@ -194,24 +194,13 @@ namespace BrukerDataReader
         /// instead of exception handling.
         /// (The Check class uses exception handling by default.)
         /// </summary>
-        public static bool UseAssertions
-        {
-            get => useAssertions;
-            set => useAssertions = value;
-        }
-        // No creation
+        public static bool UseAssertions { get; set; } = false;
 
         /// <summary>
         /// Is exception handling being used?
         /// </summary>
-        private static bool UseExceptions => !useAssertions;
-
-        // Are trace assertion statements being used?
-        // Default is to use exception handling.
-        // ReSharper disable once RedundantDefaultMemberInitializer
-        private static bool useAssertions = false;
-
-    } // End Check
+        private static bool UseExceptions => !UseAssertions;
+    }
 
     /// <summary>
     /// Exception raised when a contract is broken.
