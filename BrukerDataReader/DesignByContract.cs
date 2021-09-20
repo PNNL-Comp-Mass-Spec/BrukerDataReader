@@ -7,7 +7,7 @@ namespace BrukerDataReader
     [AttributeUsage(AttributeTargets.All)]
     public class CoverageExcludeAttribute : Attribute { }
 
-    [CoverageExcludeAttribute]
+    [CoverageExclude]
     public static class Check
     {
         /// <summary>
@@ -209,7 +209,7 @@ namespace BrukerDataReader
     /// any DesignByContract exception and other runtime exceptions.
     ///
     /// </summary>
-    [CoverageExcludeAttribute]
+    [CoverageExclude]
     [Serializable]
     public class DesignByContractException : ApplicationException
     {
@@ -221,7 +221,7 @@ namespace BrukerDataReader
     /// <summary>
     /// Exception raised when a precondition fails.
     /// </summary>
-    [CoverageExcludeAttribute]
+    [CoverageExclude]
     [Serializable]
     public class PreconditionException : DesignByContractException
     {
@@ -229,10 +229,12 @@ namespace BrukerDataReader
         /// Precondition Exception.
         /// </summary>
         public PreconditionException() { }
+
         /// <summary>
         /// Precondition Exception.
         /// </summary>
         public PreconditionException(string message) : base(message) { }
+
         /// <summary>
         /// Precondition Exception.
         /// </summary>
@@ -242,7 +244,7 @@ namespace BrukerDataReader
     /// <summary>
     /// Exception raised when a postcondition fails.
     /// </summary>
-    [CoverageExcludeAttribute]
+    [CoverageExclude]
     [Serializable]
     public class PostconditionException : DesignByContractException
     {
@@ -250,10 +252,12 @@ namespace BrukerDataReader
         /// Postcondition Exception.
         /// </summary>
         public PostconditionException() { }
+
         /// <summary>
         /// Postcondition Exception.
         /// </summary>
         public PostconditionException(string message) : base(message) { }
+
         /// <summary>
         /// Postcondition Exception.
         /// </summary>
@@ -263,7 +267,7 @@ namespace BrukerDataReader
     /// <summary>
     /// Exception raised when an invariant fails.
     /// </summary>
-    [CoverageExcludeAttribute]
+    [CoverageExclude]
     [Serializable]
     public class InvariantException : DesignByContractException
     {
@@ -284,7 +288,7 @@ namespace BrukerDataReader
     /// <summary>
     /// Exception raised when an assertion fails.
     /// </summary>
-    [CoverageExcludeAttribute]
+    [CoverageExclude]
     [Serializable]
     public class AssertionException : DesignByContractException
     {
@@ -292,10 +296,12 @@ namespace BrukerDataReader
         /// Assertion Exception.
         /// </summary>
         public AssertionException() { }
+
         /// <summary>
         /// Assertion Exception.
         /// </summary>
         public AssertionException(string message) : base(message) { }
+
         /// <summary>
         /// Assertion Exception.
         /// </summary>
