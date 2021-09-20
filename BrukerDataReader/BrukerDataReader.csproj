@@ -57,6 +57,7 @@
     <Compile Include="DesignByContract.cs" />
     <Compile Include="FourierTransform.cs" />
     <Compile Include="GlobalParameters.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
