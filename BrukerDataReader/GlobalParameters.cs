@@ -69,12 +69,12 @@ namespace BrukerDataReader
         public void Display()
         {
             var sb = new StringBuilder();
-            sb.Append("ML1 =    " + ML1.ToString("0.000") + Environment.NewLine);
-            sb.Append("ML2 =    " + ML2.ToString("0.000") + Environment.NewLine);
-            sb.Append("SW_h =   " + SampleRate.ToString("0.000") + Environment.NewLine);
-            sb.Append("TD =     " + NumValuesInScan + Environment.NewLine);
-            sb.Append("MZ_min = " + AcquiredMZMinimum.ToString("0.000") + Environment.NewLine);
-            sb.Append("MZ_max = " + AcquiredMZMaximum.ToString("0.000") + Environment.NewLine);
+            sb.AppendFormat("ML1 =    {0:F3}{1}", ML1, Environment.NewLine);
+            sb.AppendFormat("ML2 =    {0:F3}{1}", ML2, Environment.NewLine);
+            sb.AppendFormat("SW_h =   {0:F3}{1}", SampleRate, Environment.NewLine);
+            sb.AppendFormat("TD =     {0}{1}", NumValuesInScan, Environment.NewLine);
+            sb.AppendFormat("MZ_min = {0:F3}{1}", AcquiredMZMinimum, Environment.NewLine);
+            sb.AppendFormat("MZ_max = {0:F3}{1}", AcquiredMZMaximum, Environment.NewLine);
 
             Console.WriteLine(sb.ToString());
         }
