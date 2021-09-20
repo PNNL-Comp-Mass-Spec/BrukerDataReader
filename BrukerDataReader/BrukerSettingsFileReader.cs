@@ -164,7 +164,7 @@ namespace BrukerDataReader
             // but exclude matches to
             //   &lt;</
 
-            var reLessThanMatcher = new Regex(@"&lt;<(?!/)", RegexOptions.Compiled);
+            var reLessThanMatcher = new Regex("&lt;<(?!/)", RegexOptions.Compiled);
 
             var fixedFilePath = Path.GetTempFileName();
 
