@@ -11,12 +11,11 @@ namespace BrukerDataReader
     {
         // Ignore Spelling: acqu, acqus, apodization, Bruker, fid, ser
 
-        readonly string _fileName;
-        int _numMSScans = -1;
-        int _lastScanOpened;
-        BinaryReader _reader;
-        long _previousStartPosition;
-        long _bytesAdvanced;
+        private int _numMSScans = -1;
+        private int _lastScanOpened;
+        private BinaryReader _reader;
+        private long _previousStartPosition;
+        private long _bytesAdvanced;
 
         private readonly FourierTransform _fourierTransform = new FourierTransform();
 

@@ -7,12 +7,12 @@ using System.Xml.Linq;
 
 namespace BrukerDataReader
 {
-    class BrukerSettingsFileReader
+    internal class BrukerSettingsFileReader
     {
-        struct BrukerNameValuePair
         // ReSharper disable once CommentTypo
         // Ignore Spelling: Bruker, paramlist, pre
 
+        private struct BrukerNameValuePair
         {
             public string Name;
             public string Value;
