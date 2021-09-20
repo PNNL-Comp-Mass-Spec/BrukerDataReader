@@ -103,7 +103,7 @@ namespace BrukerDataReader
 
             // Determine the number of scans using the file length
 
-            Check.Require(Parameters != null && Parameters.NumValuesInScan > 0, "Cannot determine number of MS Scans. Parameter for number of points in Scan has not been set.");
+            Check.Require(Parameters?.NumValuesInScan > 0, "Cannot determine number of MS Scans. Parameter for number of points in Scan has not been set.");
 
             using (var reader = new BinaryReader(File.Open(FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
             {
@@ -202,7 +202,7 @@ namespace BrukerDataReader
 
         public void GetMassSpectrum(int scanNum, float minMZ, float maxMZ, out float[] mzValues, out float[] intensities)
         {
-            Check.Require(Parameters != null && Parameters.ML1 > -1, "Cannot get mass spectrum. Need to first set Parameters.");
+            Check.Require(Parameters?.ML1 > -1, "Cannot get mass spectrum. Need to first set Parameters.");
             Check.Require(maxMZ >= minMZ, "Cannot get mass spectrum. MinMZ is greater than MaxMZ - that's impossible.");
 
             if (Parameters == null)
