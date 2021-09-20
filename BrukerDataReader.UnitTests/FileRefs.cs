@@ -1,6 +1,6 @@
 ﻿namespace BrukerDataReader.UnitTests
 {
-    public class FileRefs
+    public static class FileRefs
     {
         public static string Bruker_12T_FID_File1 = @"\\proto-2\unitTest_Files\BrukerDataReader\Bruker_Solarix12T\HVY_MSCAL_000001\HVY_MSCAL_000001.D\fid";
 

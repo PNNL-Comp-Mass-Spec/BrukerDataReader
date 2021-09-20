@@ -3,7 +3,7 @@ using System.Text;
 
 namespace BrukerDataReader.UnitTests
 {
-    public class TestUtilities
+    public static class TestUtilities
     {
         public static void DisplayXYValues(
             float[] xValues,
