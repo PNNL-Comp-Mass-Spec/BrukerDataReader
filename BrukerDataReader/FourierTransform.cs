@@ -120,9 +120,7 @@ namespace BrukerDataReader
 
         private void SwapValuesInArray(ref double[] data, long i, long j)
         {
-            var tempVal = data[j];
-            data[j] = data[i];
-            data[i] = tempVal;
+            (data[j], data[i]) = (data[i], data[j]);
         }
     }
 }
