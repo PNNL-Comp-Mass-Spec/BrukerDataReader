@@ -32,10 +32,10 @@ namespace BrukerDataReader.UnitTests
 
             var timeList = new List<long>();
 
-            var scanNum = 1000;
-            reader.GetMassSpectrum(scanNum, out var mzVals, out var intensities);
+            const int testScan = 1000;
+            reader.GetMassSpectrum(testScan, out var mzVals, out var intensities);
 
-            var testIndex = 100000;
+            const int testIndex = 100000;
 
             var testXVal = mzVals[testIndex];
             var testYVal = intensities[testIndex];
@@ -45,9 +45,9 @@ namespace BrukerDataReader.UnitTests
             {
                 sw.Start();
 
-                Console.Write("scan= " + scanNum);
+                Console.Write("scan= " + testScan);
 
-                reader.GetMassSpectrum(scanNum, out mzVals, out intensities);
+                reader.GetMassSpectrum(testScan, out mzVals, out intensities);
                 sw.Stop();
                 Console.WriteLine("; time= " + sw.ElapsedMilliseconds);
                 timeList.Add(sw.ElapsedMilliseconds);
@@ -78,15 +78,15 @@ namespace BrukerDataReader.UnitTests
 
             var timeList = new List<long>();
 
-            var scanNum = 1000;
-            reader.GetMassSpectrum(scanNum, out _, out _);
+            const int testScan = 1000;
+            reader.GetMassSpectrum(testScan, out _, out _);
 
             var sw = new Stopwatch();
             for (var i = 0; i < 100; i++)
             {
                 sw.Start();
 
-                var currentScan = scanNum + i;
+                var currentScan = testScan + i;
                 Console.Write("scan= " + currentScan);
                 reader.GetMassSpectrum(currentScan, out _, out _);
                 sw.Stop();
@@ -116,15 +116,15 @@ namespace BrukerDataReader.UnitTests
 
             var timeList = new List<long>();
 
-            var scanNum = 1000;
-            reader.GetMassSpectrum(scanNum, out _, out _);
+            const int testScan = 1000;
+            reader.GetMassSpectrum(testScan, out _, out _);
 
             var sw = new Stopwatch();
             for (var i = 0; i < 100; i++)
             {
                 sw.Start();
 
-                var currentScan = scanNum + i;
+                var currentScan = testScan + i;
                 Console.Write("scan= " + currentScan);
                 reader.GetMassSpectrum(currentScan, out _, out _);
                 sw.Stop();
@@ -154,15 +154,15 @@ namespace BrukerDataReader.UnitTests
 
             var timeList = new List<long>();
 
-            var scanNum = 1000;
-            reader.GetMassSpectrum(scanNum, out _, out _);
+            const int testScan = 1000;
+            reader.GetMassSpectrum(testScan, out _, out _);
 
             var sw = new Stopwatch();
             for (var i = 0; i < 100; i++)
             {
                 sw.Start();
 
-                var currentScan = scanNum + i;
+                var currentScan = testScan + i;
 
                 int[] scansToBeSummed = { currentScan - 1, currentScan, currentScan + 1 };
 
@@ -195,18 +195,18 @@ namespace BrukerDataReader.UnitTests
 
             var timeList = new List<long>();
 
-            var scanNum = 1000;
-            var minMZ = 695.5f;
-            var maxMZ = 696.9f;
+            const int testScan = 1000;
+            const float minMZ = 695.5f;
+            const float maxMZ = 696.9f;
 
-            reader.GetMassSpectrum(scanNum, minMZ, maxMZ, out _, out _);
+            reader.GetMassSpectrum(testScan, minMZ, maxMZ, out _, out _);
 
             var sw = new Stopwatch();
             for (var i = 0; i < 100; i++)
             {
                 sw.Start();
 
-                var currentScan = scanNum + i;
+                var currentScan = testScan + i;
                 Console.Write("scan= " + currentScan);
                 reader.GetMassSpectrum(currentScan, minMZ, maxMZ, out _, out _);
                 sw.Stop();

@@ -75,7 +75,7 @@ namespace BrukerDataReader.UnitTests
             Assert.AreEqual(4275, reader.GetNumMSScans());
             Assert.AreEqual(FileRefs.Bruker_9T_ser_File1, reader.FileName);
 
-            var testScan = 1000;
+            const int testScan = 1000;
             var sw = new Stopwatch();
             sw.Start();
             reader.GetMassSpectrum(testScan, out var mzVals, out var intensities);
@@ -104,19 +104,19 @@ namespace BrukerDataReader.UnitTests
             Assert.AreEqual(4275, reader.GetNumMSScans());
             Assert.AreEqual(FileRefs.Bruker_9T_ser_File1, reader.FileName);
 
-            var testScan = 1000;
+            const int testScan = 1000;
             reader.GetMassSpectrum(testScan, out var mzVals, out var intensities);
 
             int[] testScans = { 999, 1000, 1001 };
             reader.GetMassSpectrum(testScans, out var mzValsSummed, out var intensitiesSummed);
 
-            var testPoint = 118966;
+            const int testIndex = 118966;
 
-            Assert.AreEqual(713.6588m, (decimal)mzVals[testPoint]);
-            Assert.AreEqual(4970526m, (decimal)intensities[testPoint]);
+            Assert.AreEqual(713.6588m, (decimal)mzVals[testIndex]);
+            Assert.AreEqual(4970526m, (decimal)intensities[testIndex]);
 
-            Assert.AreEqual(713.6588m, (decimal)mzValsSummed[testPoint]);
-            Assert.AreEqual(16332480m, (decimal)intensitiesSummed[testPoint]);
+            Assert.AreEqual(713.6588m, (decimal)mzValsSummed[testIndex]);
+            Assert.AreEqual(16332480m, (decimal)intensitiesSummed[testIndex]);
 
             //713.658752441406	4970525.5
 
@@ -138,7 +138,7 @@ namespace BrukerDataReader.UnitTests
 
             Assert.AreEqual(18, reader.GetNumMSScans());
 
-            var testScan = 4;
+            const int testScan = 4;
             reader.GetMassSpectrum(testScan, out var mzVals, out var intensities);
             Assert.AreEqual(789.9679m, (decimal)mzVals[129658]);
 
@@ -163,7 +163,7 @@ namespace BrukerDataReader.UnitTests
 
             Assert.AreEqual(21, reader.GetNumMSScans());
 
-            var testScan = 10;
+            const int testScan = 10;
             reader.GetMassSpectrum(testScan, out var mzVals, out var intensities);
             Assert.AreEqual(375.6136m, (decimal)mzVals[129658]);
 
@@ -186,7 +186,7 @@ namespace BrukerDataReader.UnitTests
 
             Assert.AreEqual(1, reader.GetNumMSScans());
 
-            var testScan = 0;
+            const int testScan = 0;
             reader.GetMassSpectrum(testScan, out var mzVals, out var intensities);
             Assert.AreEqual(1580.17m, (decimal)mzVals[129658]);
 
@@ -196,10 +196,11 @@ namespace BrukerDataReader.UnitTests
         [Test]
         public void ReadParamFile_Test1()
         {
-            var fiSerFile = new FileInfo(FileRefs.Bruker15TFile1);
-            var diFolder = fiSerFile.Directory;
+            var serFile = new FileInfo(FileRefs.Bruker15TFile1);
+            var directory = serFile.Directory;
 
-            var settingsFilePath = Path.Combine(diFolder.FullName, "ESI_pos_150_3000.m", "apexAcquisition.method");
+
+            var settingsFilePath = Path.Combine(directory.FullName, "ESI_pos_150_3000.m", "apexAcquisition.method");
             if (!File.Exists(settingsFilePath))
                 throw new FileNotFoundException("Settings file not found at " + settingsFilePath);
 
@@ -216,10 +217,10 @@ namespace BrukerDataReader.UnitTests
         [Test]
         public void ReadParamFile_Test2()
         {
-            var fiSerFile = new FileInfo(FileRefs.Bruker_12T_ser_File1);
-            var diFolder = fiSerFile.Directory;
+            var serFile = new FileInfo(FileRefs.Bruker_12T_ser_File1);
+            var directory = serFile.Directory;
 
-            var settingsFilePath = Path.Combine(diFolder.FullName, "ACQUS");
+            var settingsFilePath = Path.Combine(directory.FullName, "ACQUS");
             if (!File.Exists(settingsFilePath))
                 throw new FileNotFoundException("Settings file not found at " + settingsFilePath);
 
@@ -234,10 +235,11 @@ namespace BrukerDataReader.UnitTests
         [Test]
         public void ReadParamFile_Test3()
         {
-            var fiSerFile = new FileInfo(FileRefs.Bruker_9T_ser_File1);
-            var diFolder = fiSerFile.Directory;
+            var serFile = new FileInfo(FileRefs.Bruker_9T_ser_File1);
+            var directory = serFile.Directory;
 
-            var settingsFilePath = Path.Combine(diFolder.FullName, "acqus");
+
+            var settingsFilePath = Path.Combine(directory.FullName, "acqus");
             if (!File.Exists(settingsFilePath))
                 throw new FileNotFoundException("Settings file not found at " + settingsFilePath);
 
@@ -266,10 +268,10 @@ namespace BrukerDataReader.UnitTests
                 }
             };
 
-            var testScan = 1000;
+            const int testScan = 1000;
 
-            var minMZ = 695.5f;
-            var maxMz = 696.9f;
+            const float minMZ = 695.5f;
+            const float maxMz = 696.9f;
 
             reader.GetMassSpectrum(testScan, minMZ, maxMz, out var mzVals, out var intensities);
         }
@@ -288,10 +290,10 @@ namespace BrukerDataReader.UnitTests
                 }
             };
 
-            var testScan = 1000;
+            const int testScan = 1000;
 
-            var minMZ = 1f;
-            var maxMz = 1e7f;
+            const float minMZ = 1f;
+            const float maxMz = 1e7f;
 
             reader.GetMassSpectrum(testScan, minMZ, maxMz, out var mzVals, out var intensities);
             var arrayLength = mzVals.Length;
@@ -342,10 +344,10 @@ namespace BrukerDataReader.UnitTests
                 }
             };
 
-            var testScan = 5000;
+            const int testScan = 5000;
 
-            var minMZ = 695.5f;
-            var maxMz = 696.9f;
+            const float minMZ = 695.5f;
+            const float maxMz = 696.9f;
 
             try
             {
@@ -380,8 +382,7 @@ namespace BrukerDataReader.UnitTests
 
             float[] mzVals;
             float[] intensities;
-
-            var testScan = 5000;
+            const int testScan = 5000;
 
             var ex = Assert.Throws<BrukerDataReader.PreconditionException>(() => reader.GetMassSpectrum(testScan, out mzVals, out intensities));
             Assert.That(ex.Message, Is.StringStarting("Cannot get mass spectrum. Requested scan number (5000) is greater than number of scans in dataset."));
@@ -394,7 +395,7 @@ namespace BrukerDataReader.UnitTests
             float[] mzVals;
             float[] intensities;
 
-            var testScan = 1000;
+            const int testScan = 1000;
 
             var ex = Assert.Throws<BrukerDataReader.PreconditionException>(() => reader.GetMassSpectrum(testScan, out mzVals, out intensities));
             Assert.That(ex.Message, Is.EqualTo("Cannot get mass spectrum. Need to first set Parameters."));
@@ -407,10 +408,9 @@ namespace BrukerDataReader.UnitTests
 
             float[] mzVals;
             float[] intensities;
-
-            var testScan = 1000;
-            var minMZ = 695.5f;
-            var maxMz = 696.9f;
+            const int testScan = 1000;
+            const float minMZ = 695.5f;
+            const float maxMz = 696.9f;
 
             var ex = Assert.Throws<BrukerDataReader.PreconditionException>(() => reader.GetMassSpectrum(testScan, minMZ, maxMz, out mzVals, out intensities));
             Assert.That(ex.Message, Is.EqualTo("Cannot get mass spectrum. Need to first set Parameters."));
@@ -432,10 +432,9 @@ namespace BrukerDataReader.UnitTests
 
             float[] mzVals;
             float[] intensities;
-
-            var testScan = 1000;
-            var minMZ = 700f;
-            var maxMz = 600f;
+            const int testScan = 1000;
+            const float minMZ = 700f;
+            const float maxMz = 600f;
 
             var ex = Assert.Throws<BrukerDataReader.PreconditionException>(() => reader.GetMassSpectrum(testScan, minMZ, maxMz, out mzVals, out intensities));
             Assert.That(ex.Message, Is.EqualTo("Cannot get mass spectrum. MinMZ is greater than MaxMZ - that's impossible."));
