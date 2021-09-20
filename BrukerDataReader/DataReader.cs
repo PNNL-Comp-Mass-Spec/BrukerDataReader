@@ -331,22 +331,18 @@ namespace BrukerDataReader
         {
             var freq = i * Parameters.SampleRate / Parameters.NumValuesInScan;
 
-            double mass;
             if (Math.Abs(freq + Parameters.ML2) > 0)
             {
-                mass = Parameters.ML1 / (freq + Parameters.ML2);
+                return Parameters.ML1 / (freq + Parameters.ML2);
             }
-            else if (freq - Parameters.ML2 <= 0)
-            {
-                mass = Parameters.ML1;
-            }
-            else
-            {
-                mass = 0;
-            }
-            return mass;
-        }
 
+            if (freq - Parameters.ML2 <= 0)
+            {
+                return Parameters.ML1;
+            }
+
+            return 0;
+        }
 
         public void Dispose()
         {
