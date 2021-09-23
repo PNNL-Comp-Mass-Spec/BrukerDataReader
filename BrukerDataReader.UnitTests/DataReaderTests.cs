@@ -351,18 +351,18 @@ namespace BrukerDataReader.UnitTests
                 }
             };
 
-            const int testScan = 5000;
+            const int testScanIndex = 5000;
 
             const float minMZ = 695.5f;
             const float maxMz = 696.9f;
 
             try
             {
-                reader.GetMassSpectrum(testScan, minMZ, maxMz, out _, out _);
+                reader.GetMassSpectrum(testScanIndex, minMZ, maxMz, out _, out _);
             }
             catch (PreconditionException ex)
             {
-                Assert.That(ex.Message, Is.StringStarting("Cannot get mass spectrum. Requested scan number (5000) is greater than number of scans in dataset."));
+                Assert.That(ex.Message, Is.StringStarting("Cannot get mass spectrum. Requested scan index (5000) is greater than number of scans in dataset."));
                 return;
             }
             catch (Exception ex)
@@ -370,7 +370,7 @@ namespace BrukerDataReader.UnitTests
                 throw new Exception("Unexpected exception", ex);
             }
 
-            throw new Exception("PreconditionException was not thrown due to the out-of-range scan number; test failed");
+            throw new Exception("PreconditionException was not thrown due to the out-of-range scan index; test failed");
         }
 
         [Test]
@@ -390,7 +390,7 @@ namespace BrukerDataReader.UnitTests
             const int testScan = 5000;
 
             var ex = Assert.Throws<PreconditionException>(() => reader.GetMassSpectrum(testScan, out _, out _));
-            Assert.That(ex.Message, Is.StringStarting("Cannot get mass spectrum. Requested scan number (5000) is greater than number of scans in dataset."));
+            Assert.That(ex.Message, Is.StringStarting("Cannot get mass spectrum. Requested scan index (5000) is greater than number of scans in dataset."));
         }
         [Test]
         public void ExceptionTest_ParametersNotSet_Test1()

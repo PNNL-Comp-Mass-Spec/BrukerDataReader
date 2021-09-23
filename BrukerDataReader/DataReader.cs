@@ -12,7 +12,7 @@ namespace BrukerDataReader
         // Ignore Spelling: acqu, acqus, apodization, Bruker, fid, ser
 
         private int _numMSScans = -1;
-        private int _lastScanOpened;
+        private int _lastScanIndexOpened;
         private BinaryReader _reader;
         private long _previousStartPosition;
         private long _bytesAdvanced;
@@ -123,10 +123,10 @@ namespace BrukerDataReader
         /// <param name="mzValues">array of m/z values</param>
         /// <param name="intensities">Array of intensity values</param>
         // ReSharper disable once UnusedMember.Global
-        public void GetMassSpectrumUsingSupposedlyFasterBinaryReader(int scanNum, out float[] mzValues, out float[] intensities)
+        public void GetMassSpectrumUsingSupposedlyFasterBinaryReader(int scanIndex, out float[] mzValues, out float[] intensities)
         {
             Check.Require(Parameters != null, "Cannot get mass spectrum. Need to first set Parameters.");
-            Check.Require(scanNum < GetNumMSScans(), "Cannot get mass spectrum. Requested scan number is greater than number of scans in dataset.");
+            Check.Require(scanIndex < GetNumMSScans(), "Cannot get mass spectrum. Requested scan index is greater than number of scans in the dataset.");
 
             if (_reader == null)
             {
@@ -137,7 +137,7 @@ namespace BrukerDataReader
                 throw new Exception("Parameters is null in GetMassSpectrumUsingSupposedlyFasterBinaryReader");
 
             var vals = new double[Parameters.NumValuesInScan];
-            var diffBetweenCurrentAndPreviousScan = scanNum - _lastScanOpened;
+            var diffBetweenCurrentAndPreviousScan = scanIndex - _lastScanIndexOpened;
 
             var byteOffset = diffBetweenCurrentAndPreviousScan * (long)Parameters.NumValuesInScan * sizeof(int) - _bytesAdvanced;
 
@@ -182,7 +182,7 @@ namespace BrukerDataReader
                 intensities[i - indexOfLowMZ] = intensitiesFullRange[i];
             }
 
-            _lastScanOpened = scanNum;
+            _lastScanIndexOpened = scanIndex;
         }
 
         /// <summary>
@@ -193,14 +193,13 @@ namespace BrukerDataReader
         /// <param name="scanNum">Zero-based scan number</param>
         /// <param name="mzValues">m/z values are returned here</param>
         /// <param name="intensities">intensity values are returned here</param>
-        public void GetMassSpectrum(int scanNum, out float[] mzValues, out float[] intensities)
+        public void GetMassSpectrum(int scanIndex, out float[] mzValues, out float[] intensities)
         {
-            var scanNums = new[] { scanNum };
+            var scanIndices = new[] { scanIndex };
 
-            GetMassSpectrum(scanNums, out mzValues, out intensities);
+            GetMassSpectrum(scanIndices, out mzValues, out intensities);
         }
 
-        public void GetMassSpectrum(int scanNum, float minMZ, float maxMZ, out float[] mzValues, out float[] intensities)
         {
             Check.Require(Parameters?.ML1 > -1, "Cannot get mass spectrum. Need to first set Parameters.");
             Check.Require(maxMZ >= minMZ, "Cannot get mass spectrum. MinMZ is greater than MaxMZ - that's impossible.");
@@ -211,7 +210,7 @@ namespace BrukerDataReader
             Parameters.MinMZFilter = minMZ;
             Parameters.MaxMZFilter = maxMZ;
 
-            GetMassSpectrum(scanNum, out mzValues, out intensities);
+            GetMassSpectrum(scanIndex, out mzValues, out intensities);
         }
 
         /// <summary>
@@ -220,24 +219,24 @@ namespace BrukerDataReader
         /// <param name="scanNumsToBeSummed"></param>
         /// <param name="mzValues"></param>
         /// <param name="intensities"></param>
-        public void GetMassSpectrum(int[] scanNumsToBeSummed, out float[] mzValues, out float[] intensities)
+        public void GetMassSpectrum(int[] scanIndicesToBeSummed, out float[] mzValues, out float[] intensities)
         {
             Check.Require(Parameters != null && Math.Abs(Parameters.ML1 - (-1)) > float.Epsilon, "Cannot get mass spectrum. Need to first set Parameters.");
             if (Parameters == null)
                 throw new Exception("Parameters is null in GetMassSpectrum");
 
-            ValidateScanNums(scanNumsToBeSummed);
-            //Check.Require(scanNum < GetNumMSScans(), "Cannot get mass spectrum. Requested scan number is greater than number of scans in dataset.");
+            ValidateScanIndices(scanIndicesToBeSummed);
+            //Check.Require(scanIndex < GetNumMSScans(), "Cannot get mass spectrum. Requested scan index is greater than number of scans in dataset.");
 
             var scanDataList = new List<double[]>();
 
             using (var reader = new BinaryReader(File.Open(FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
             {
-                foreach (var scanNum in scanNumsToBeSummed)
+                foreach (var scanIndex in scanIndicesToBeSummed)
                 {
                     var vals = new double[Parameters.NumValuesInScan];
 
-                    var bytePosition = scanNum * (long)Parameters.NumValuesInScan * sizeof(int);
+                    var bytePosition = scanIndex * (long)Parameters.NumValuesInScan * sizeof(int);
 
                     reader.BaseStream.Seek(bytePosition, SeekOrigin.Begin);
                     for (var i = 0; i < Parameters.NumValuesInScan; i++)
@@ -301,11 +300,11 @@ namespace BrukerDataReader
             GetMassSpectrum(scansNumsToBeSummed, out mzValues, out intensities);
         }
 
-        private void ValidateScanNums(IEnumerable<int> scanNumsToBeSummed)
+        private void ValidateScanIndices(IEnumerable<int> scanIndicesToBeSummed)
         {
-            foreach (var scanNum in scanNumsToBeSummed)
+            foreach (var scanIndex in scanIndicesToBeSummed)
             {
-                Check.Require(scanNum < GetNumMSScans(),"Cannot get mass spectrum. Requested scan number (" + scanNum + ") is greater than number of scans in dataset. Note that the first scan is scan 0");
+                Check.Require(scanIndex < GetNumMSScans(), "Cannot get mass spectrum. Requested scan index (" + scanIndex + ") is greater than number of scans in dataset. Note that the first scan is scan 0");
             }
         }
 
