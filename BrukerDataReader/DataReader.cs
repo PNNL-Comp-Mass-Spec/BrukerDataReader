@@ -267,8 +267,6 @@ namespace BrukerDataReader
 
                     scanDataList.Add(vals);
                 }
-
-                reader.Close();
             }
 
             var lengthOfMZAndIntensityArray = Parameters.NumValuesInScan / 2;
