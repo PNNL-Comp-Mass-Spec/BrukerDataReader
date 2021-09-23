@@ -19,7 +19,7 @@ namespace BrukerDataReader
 
         /// <summary>
         /// The number of individual values in a scan. For FTMS, typically this is a power of 2.
-        /// e.g.  if there are 8 values, this translates to 4 XY data points
+        /// e.g. if there are 8 values, this translates to 4 XY data points
         /// </summary>
         /// <remarks>TD</remarks>
         public int NumValuesInScan { get; set; }

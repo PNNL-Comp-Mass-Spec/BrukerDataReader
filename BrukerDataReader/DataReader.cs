@@ -116,10 +116,13 @@ namespace BrukerDataReader
         }
 
         /// <summary>
-        /// Gets the mass spectrum.  Opens the BinaryReader and doesn't close it. Then finds the correct scan
-        /// by using a relative position within the reader.  It turns out to be only ~3-4% faster.
+        /// Gets the mass spectrum. Opens the BinaryReader and keeps it open between calls to this method.
+        /// Finds the correct scan by using a relative position within the reader
         /// </summary>
-        /// <param name="scanNum">Zero-based scan number</param>
+        /// <remarks>
+        /// Unit tests in 2010 showed this method to be 3% to 10% faster than GetMassSpectrum
+        /// </remarks>
+        /// <param name="scanIndex">Zero-based scan index</param>
         /// <param name="mzValues">array of m/z values</param>
         /// <param name="intensities">Array of intensity values</param>
         // ReSharper disable once UnusedMember.Global
@@ -186,11 +189,14 @@ namespace BrukerDataReader
         }
 
         /// <summary>
-        /// Gets the mass spectrum. Main difference with 'GetMassSpectrumUsingSupposedlyFasterBinaryReader' is that a new BinaryReader is created
-        /// every time here. This is advantageous in terms of making sure the file is opened and closed properly.
-        /// Unit tests show this to be about 3 to 10% slower. Presently (Nov 2010), since there isn't much speed gain, I favor this one.
+        /// Gets the mass spectrum at the given 0-based scan index
         /// </summary>
-        /// <param name="scanNum">Zero-based scan number</param>
+        /// <remarks>
+        /// Main difference with method GetMassSpectrumUsingSupposedlyFasterBinaryReader is that in this method,
+        /// a new BinaryReader is created every time in this method. This is advantageous in terms of making sure
+        /// the file is opened and closed properly. Unit tests in 2010 show method GetMassSpectrum to be about 3% to 10% slower.
+        /// </remarks>
+        /// <param name="scanIndex">Zero-based scan index</param>
         /// <param name="mzValues">m/z values are returned here</param>
         /// <param name="intensities">intensity values are returned here</param>
         public void GetMassSpectrum(int scanIndex, out float[] mzValues, out float[] intensities)
@@ -200,6 +206,21 @@ namespace BrukerDataReader
             GetMassSpectrum(scanIndices, out mzValues, out intensities);
         }
 
+        /// <summary>
+        /// Gets the mass spectrum at the given 0-based scan index.
+        /// Only returns data within the given m/z range.
+        /// </summary>
+        /// <remarks>
+        /// If this method is called with m/z range filters defined,
+        /// then you later call GetMassSpectrum that does not have an m/z range,
+        /// the data will still be filtered by the previously used m/z filters.
+        /// </remarks>
+        /// <param name="scanIndex"></param>
+        /// <param name="minMZ"></param>
+        /// <param name="maxMZ"></param>
+        /// <param name="mzValues"></param>
+        /// <param name="intensities"></param>
+        public void GetMassSpectrum(int scanIndex, float minMZ, float maxMZ, out float[] mzValues, out float[] intensities)
         {
             Check.Require(Parameters?.ML1 > -1, "Cannot get mass spectrum. Need to first set Parameters.");
             Check.Require(maxMZ >= minMZ, "Cannot get mass spectrum. MinMZ is greater than MaxMZ - that's impossible.");
@@ -216,7 +237,7 @@ namespace BrukerDataReader
         /// <summary>
         /// Gets the summed mass spectrum.
         /// </summary>
-        /// <param name="scanNumsToBeSummed"></param>
+        /// <param name="scanIndicesToBeSummed"></param>
         /// <param name="mzValues"></param>
         /// <param name="intensities"></param>
         public void GetMassSpectrum(int[] scanIndicesToBeSummed, out float[] mzValues, out float[] intensities)
@@ -257,7 +278,7 @@ namespace BrukerDataReader
             for (var i = 0; i < scanDataList.Count; i++)
             {
                 var vals = scanDataList[i];
-                 _fourierTransform.RealFourierTransform(ref vals);
+                _fourierTransform.RealFourierTransform(ref vals);
 
                 for (var j = 0; j < lengthOfMZAndIntensityArray; j++)
                 {
