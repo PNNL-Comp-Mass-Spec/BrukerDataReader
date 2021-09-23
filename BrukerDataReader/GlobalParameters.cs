@@ -52,7 +52,7 @@ namespace BrukerDataReader
 
         public GlobalParameters()
         {
-            setDefaults();
+            SetDefaults();
         }
 
         // ReSharper disable once UnusedMember.Global
@@ -79,7 +79,7 @@ namespace BrukerDataReader
             Console.WriteLine(sb.ToString());
         }
 
-        private void setDefaults()
+        private void SetDefaults()
         {
             ML1 = -1;
             ML2 = -1;

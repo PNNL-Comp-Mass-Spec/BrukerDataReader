@@ -262,7 +262,7 @@ namespace BrukerDataReader.UnitTests
         }
 
         [Test]
-        public void GetMassSpectrum_smallMZRange_Test1()
+        public void GetMassSpectrum_SmallMZRange_Test1()
         {
             var reader = new DataReader(FileRefs.Bruker_9T_ser_File1)
             {
@@ -284,7 +284,7 @@ namespace BrukerDataReader.UnitTests
         }
 
         [Test]
-        public void GetMassSpectrum_extremeMZRange_test1()
+        public void GetMassSpectrum_ExtremeMZRange_test1()
         {
             var reader = new DataReader(FileRefs.Bruker_9T_ser_File1)
             {
@@ -329,7 +329,7 @@ namespace BrukerDataReader.UnitTests
         }
 
         [Test]
-        public void SetParameters_alternateConstructorTest1()
+        public void SetParameters_AlternateConstructorTest1()
         {
             var reader = new DataReader(FileRefs.Bruker_9T_ser_File1);
             reader.SetParameters(144378935.472081, 20.3413771463121, 740740.74074074, 524288);
@@ -338,7 +338,7 @@ namespace BrukerDataReader.UnitTests
         }
 
         [Test]
-        public void ExceptionTest_inputScanNumTooHigh_Test1()
+        public void ExceptionTest_InputScanIndexTooHigh_Test1()
         {
             var reader = new DataReader(FileRefs.Bruker_9T_ser_File1)
             {
@@ -374,7 +374,7 @@ namespace BrukerDataReader.UnitTests
         }
 
         [Test]
-        public void ExceptionTest_inputScanNumTooHigh_Test2()
+        public void ExceptionTest_InputScanIndexTooHigh_Test2()
         {
             var reader = new DataReader(FileRefs.Bruker_9T_ser_File1)
             {
@@ -393,7 +393,7 @@ namespace BrukerDataReader.UnitTests
             Assert.That(ex.Message, Is.StringStarting("Cannot get mass spectrum. Requested scan number (5000) is greater than number of scans in dataset."));
         }
         [Test]
-        public void ExceptionTest_parametersNotSet_Test1()
+        public void ExceptionTest_ParametersNotSet_Test1()
         {
             var reader = new DataReader(FileRefs.Bruker_9T_ser_File1);
 
@@ -404,7 +404,7 @@ namespace BrukerDataReader.UnitTests
         }
 
         [Test]
-        public void ExceptionTest_parametersNotSet_Test2()
+        public void ExceptionTest_ParametersNotSet_Test2()
         {
             var reader = new DataReader(FileRefs.Bruker_9T_ser_File1);
 
@@ -417,7 +417,7 @@ namespace BrukerDataReader.UnitTests
         }
 
         [Test]
-        public void ExceptionTest_maxMZ_smallerThanMinMZ_Test1()
+        public void ExceptionTest_MaxMZ_smallerThanMinMZ_Test1()
         {
             var reader = new DataReader(FileRefs.Bruker_9T_ser_File1)
             {
